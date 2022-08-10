@@ -1,0 +1,5 @@
+*.*
+
+## Only include this file
+!.gitignore
+!DigiCert Baltimore Root.cer
