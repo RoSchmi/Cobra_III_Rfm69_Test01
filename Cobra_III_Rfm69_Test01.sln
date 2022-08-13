@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cobra_III_Rfm69_Test01", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DayLihtSavingTime_Dll", "DayLihtSavingTime_Dll\DayLihtSavingTime_Dll.csproj", "{D640BCD3-46DD-441A-9FBC-E041FA02008E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MODBUS_Dll", "MODBUS_Dll\MODBUS_Dll.csproj", "{92F2F957-0A17-44C9-A7E5-07D912741D75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSON_NETMF_Dll", "JSON_NETMF_Dll\JSON_NETMF_Dll.csproj", "{470AB70B-767C-448E-97FF-68018A8FDC8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,14 @@ Global
 		{D640BCD3-46DD-441A-9FBC-E041FA02008E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D640BCD3-46DD-441A-9FBC-E041FA02008E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D640BCD3-46DD-441A-9FBC-E041FA02008E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F2F957-0A17-44C9-A7E5-07D912741D75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F2F957-0A17-44C9-A7E5-07D912741D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F2F957-0A17-44C9-A7E5-07D912741D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F2F957-0A17-44C9-A7E5-07D912741D75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{470AB70B-767C-448E-97FF-68018A8FDC8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{470AB70B-767C-448E-97FF-68018A8FDC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{470AB70B-767C-448E-97FF-68018A8FDC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{470AB70B-767C-448E-97FF-68018A8FDC8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

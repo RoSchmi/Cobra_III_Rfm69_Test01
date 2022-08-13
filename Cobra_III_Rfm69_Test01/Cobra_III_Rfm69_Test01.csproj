@@ -29,18 +29,45 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AzureSendManager.cs" />
+    <Compile Include="AzureSendManagerBase.cs" />
+    <Compile Include="Counters.cs" />
     <Compile Include="FixedTimeService.cs" />
     <Compile Include="GenerateUniqueMacAddr.cs" />
     <Compile Include="OnOffBaseSensorMgr.cs" />
     <Compile Include="OnOffRfm69SensorMgr.cs" />
+    <Compile Include="OnOffSample.cs" />
+    <Compile Include="OnOffSampleBase.cs" />
+    <Compile Include="PervasiveDigital\Security\ManagedProviders\HMACSHA256.cs" />
+    <Compile Include="PervasiveDigital\Security\ManagedProviders\IHashAlgorithm.cs" />
+    <Compile Include="PervasiveDigital\Security\ManagedProviders\Sha2.cs" />
+    <Compile Include="PervasiveDigital\Utilities\FormatException.cs" />
+    <Compile Include="PervasiveDigital\Utilities\StringExtensions.cs" />
+    <Compile Include="PervasiveDigital\Utilities\StringUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RegexTest.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RFM69_NETMF.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\AzureStorageHelper.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\BasicHttpResponse.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\ByteExtensions.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\CloudStorageAccount.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\ITableEntity.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\makePropertyArray.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\TableClient.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\TableEntity.cs" />
+    <Compile Include="RoSchmi\Net\Azure\Storage\TableEntityProperty.cs" />
+    <Compile Include="RoSchmi\Utilities\Reform_uint16_2_float32.cs" />
+    <Compile Include="SampleHoldValue.cs" />
+    <Compile Include="SampleValue.cs" />
+    <Compile Include="SensorValue.cs" />
+    <Compile Include="TempEntity.cs" />
+    <Compile Include="X_Stellig.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="GHI.Hardware, Version=4.3.8.1, Culture=neutral, processorArchitecture=MSIL" />
@@ -52,9 +79,14 @@
     <Reference Include="Microsoft.SPOT.IO" />
     <Reference Include="Microsoft.SPOT.Native" />
     <Reference Include="Microsoft.SPOT.Net" />
+    <Reference Include="Microsoft.SPOT.Net.Security" />
+    <Reference Include="Microsoft.SPOT.Security.PKCS11" />
     <Reference Include="Microsoft.SPOT.Time" />
     <Reference Include="System" />
+    <Reference Include="System.Http" />
     <Reference Include="System.IO" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Text.RegularExpressions" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +101,14 @@
       <Project>{D640BCD3-46DD-441A-9FBC-E041FA02008E}</Project>
       <Name>DayLihtSavingTime_Dll</Name>
     </ProjectReference>
+    <ProjectReference Include="..\JSON_NETMF_Dll\JSON_NETMF_Dll.csproj">
+      <Project>{470AB70B-767C-448E-97FF-68018A8FDC8A}</Project>
+      <Name>JSON_NETMF_Dll</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MODBUS_Dll\MODBUS_Dll.csproj">
+      <Project>{92F2F957-0A17-44C9-A7E5-07D912741D75}</Project>
+      <Name>MODBUS_Dll</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AzureAccountKey.txt" />
@@ -77,6 +117,7 @@
   <ItemGroup>
     <None Include="Resources\AzureAccountName.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Condition="EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets" />
   <Import Condition="!EXISTS('$(NetMfTargetsBaseDir)$(TargetFrameworkVersion)\CSharp.Targets')" Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

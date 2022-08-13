@@ -1,3 +1,11 @@
+// Cobra_III_Rfm69_Test01 Program Copyright RoSchmi 2022 License Apache 2.0,  Version 1.1.0 vom 13.08.2022, 
+// NETMF 4.3, GHI SDK 2016 R1
+// Hardware: GHI Cobra III Mainboard, Enc28 Ethernet module 
+// Dieses Programm dient zur Registrierung der gemessenen Stromwerte eines Smartmeters
+// sowie der Messung von Temperaturen und der relativen Luftfeutigkeit
+
+
+
 
 //#define DebugPrint
 
@@ -7,10 +15,10 @@ using System;
 using System.Threading;
 using System.Net;
 //using System.Text;
-//using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using System.IO;
 using System.IO.Ports;
-//using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.X509Certificates;
 //using System.Collections;
 using System.Xml;
 using System.Ext.Xml;
@@ -25,19 +33,21 @@ using GHI.IO.Storage;
 using Microsoft.SPOT.Time;
 using RoSchmi.DayLihtSavingTime;
 using RoSchmi.RFM69_NETMF;
+using RoSchmi.Utilities;
 //using RoSchmi.RF_433_Receiver;
 
 // RoSchmi.RS232;
 //using RoSchmi.ButtonNETMF;
 //using RoSchmi.Net.ALLNET;
-//using RoSchmi.Net.Azure.Storage;
+using RoSchmi.Net.Azure.Storage;
 //using RoSchmi.Net.SparkPost;
 using RoSchmi.Net.Divers;
 //using RoSchmi.Logger
 //using SparkPostEmailTemplates;
 //using Osre.Modbus;
 //using Osre.Modbus.Interface;
-//using PervasiveDigital.Utilities;
+using PervasiveDigital;
+using PervasiveDigital.Utilities;
 
 #endregion
 
@@ -96,6 +106,45 @@ namespace Cobra_III_Rfm69_Test01
             private static string dstStart = "Mar Sun>=8"; // 2nd Sunday March (US 2013)
             private static string dstEnd = "Nov Sun>=1"; // 1st Sunday Nov (US 2013)
             */
+
+
+            // if time has elapsed, the acutal entry in the SampleValueBuffer is sent to azure, otherwise it is neglected (here: 1 sec, so it is always sended)
+            //private static TimeSpan sendInterval_Burner = new TimeSpan(0, 0, 1); // If this time interval has expired since the last sending to azure,         
+            //private static TimeSpan sendInterval_Boiler = new TimeSpan(0, 0, 1);
+            //private static TimeSpan sendInterval_Solar = new TimeSpan(0, 0, 1);
+            private static TimeSpan sendInterval_Current = new TimeSpan(0, 0, 1);
+            //private static TimeSpan sendInterval_SolarTemps = new TimeSpan(0, 0, 1);
+
+            // RoSchmi
+            //private static bool workWithWatchDog = true;    // Choose whether the App runs with WatchDog, should normally be set to true
+            private static bool workWithWatchDog = false;
+            private static int watchDogTimeOut = 50;        // WatchDog timeout in sec: Max Value for G400 15 sec, G120 134 sec, EMX 4.294 sec
+            // = 50 sec, don't change without need, may not be below 30 sec 
+
+            static Timer _sensorControlTimer;
+            static TimeSpan _sensorControlTimerInterval = new TimeSpan(0, 35, 0);  // 35 minutes
+            // The event handler of this  timer checks if there was an event of the solarPumpCurrentSensor
+            // in the selected time (here 35 min). This means that the program is running but receiving data via RF69 hangs 
+            // in this very rarely occuring case we reset the board
+
+
+
+            // If the free ram of the mainboard is below this level it will reboot (because of https memory leak)
+            private static int freeRamThreshold = 4300000;
+            //private static int freeRamThreshold = 3300000;
+
+            // You can select what kind of Debug.Print messages are sent
+
+            //public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.StandardDebug;
+            public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.NoDebug;
+            public static AzureStorageHelper.DebugLevel _AzureDebugLevel = AzureStorageHelper.DebugLevel.DebugAll;
+
+            // To use Fiddler as WebProxy set attachFiddler = true and set the proper IPAddress and port
+            // Use the local IP-Address of the PC where Fiddler is running
+            // see: -http://blog.devmobile.co.nz/2013/01/09/netmf-http-debugging-with-fiddler
+            private static bool attachFiddler = false;
+            private const string fiddlerIPAddress = "192.168.1.21"; // Set to the IP-Adress of your PC
+            private const int fiddlerPort = 8888;                   // Standard port of fiddler
         #endregion
 
 
@@ -132,7 +181,7 @@ namespace Cobra_III_Rfm69_Test01
 
 
          
-          //private const string _tablePreFix_Definition_3 = "SolarTemps";   // Preset, doesn't come in the sensor eventhandle
+          private const string _tablePreFix_Definition_3 = "SolarTemps";   // Preset, doesn't come in the sensor eventhandle
 
 
 
@@ -140,7 +189,7 @@ namespace Cobra_III_Rfm69_Test01
           //private static string _partitionKeyPrefix_Burner = "Y3_";   // Preset, comes in the sensor eventhandler
           //private static string _partitionKeyPrefix_Boiler = "Y3_";
           private static string _partitionKeyPrefix_Solar = "Y3_";
-          //private static string _partitionKey_Current = "Y2_";
+          private static string _partitionKey_Current = "Y2_";
 
 
           // if augmentPartitionKey == true, the actual year and month are added, e.g. Y_2016_07
@@ -151,7 +200,7 @@ namespace Cobra_III_Rfm69_Test01
        //private static string _location_Burner = "Heizung";              // Preset, can be replaced with a value received in the sensor eventhandler
        //private static string _location_Boiler = "Heizung";
        private static string _location_Solar = "Heizung";
-      // private static string _location_Current = "Keller";
+       private static string _location_Current = "Keller";
 
      
 
@@ -197,6 +246,8 @@ namespace Cobra_III_Rfm69_Test01
 
             #region Fields
 
+            static AutoResetEvent waitForCurrentCallback = new AutoResetEvent(false);
+
 
             public static SDCard SD;
             private static bool _fs_ready = false;
@@ -205,6 +256,46 @@ namespace Cobra_III_Rfm69_Test01
             private static bool _hasAddress;
             private static bool _available;
 
+            private static bool watchDogIsAcitvated = false;// Don't change, choosing is done in the workWithWatchDog variable
+
+            static Thread WatchDogCounterResetThread;
+
+            private static Counters _counters = new Counters();
+
+            private static int _azureSends = 1;
+            private static int _forcedReboots = 0;
+            private static int _badReboots = 0;
+            private static int _azureSendErrors = 0;
+
+            private static bool _willRebootAfterNextEvent = false;
+
+            private const double InValidValue = 999.9;
+
+            // RoSchmi
+            static TimeSpan makeInvalidTimeSpan = new TimeSpan(2, 15, 0);  // When this timespan has elapsed, old sensor values are set to invalid
+
+
+            private static readonly object MainThreadLock = new object();
+
+
+            // Regex ^: Begin at start of line; [a-zA-Z0-9]: these chars are allowed; [^<>]: these chars ar not allowd; +$: test for every char in string until end of line
+            // Is used to exclude some not allowed characters in the strings for the name of the Azure table and the message entity property
+            static Regex _tableRegex = new Regex(@"^[a-zA-Z0-9]+$");
+            static Regex _columnRegex = new Regex(@"^[a-zA-Z0-9_]+$");
+            static Regex _stringRegex = new Regex(@"^[^<>]+$");
+
+            private static int _azureSendThreads = 0;
+            private static int _azureSendThreadResetCounter = 0;
+
+
+            // Certificate of Azure, included as a Resource
+            static byte[] caAzure = Resources.GetBytes(Resources.BinaryResources.DigiCert_Baltimore_Root);
+
+            // See -https://blog.devmobile.co.nz/2013/03/01/https-with-netmf-http-client-managing-certificates/ how to include a certificate
+
+            private static X509Certificate[] caCerts;
+
+
             private static TimeServiceSettings timeSettings;
             private static bool timeServiceIsRunning = false;
             private static bool timeIsSet = false;
@@ -212,14 +303,20 @@ namespace Cobra_III_Rfm69_Test01
             //private static OnOffDigitalSensorMgr myBurnerSensor;
             //private static OnOffAnalogSensorMgr myStoragePumpSensor;
             private static OnOffRfm69SensorMgr mySolarPumpCurrentSensor;
-            //private static CloudStorageAccount myCloudStorageAccount;
+            private static CloudStorageAccount myCloudStorageAccount;
             //private static AzureSendManager_Burner myAzureSendManager_Burner;
             //private static AzureSendManager_Boiler myAzureSendManager_Boiler;
             //private static AzureSendManager_Solar myAzureSendManager_Solar;
-            //private static AzureSendManager myAzureSendManager;
+            private static AzureSendManager myAzureSendManager;
             //private static AzureSendManager_SolarTemps myAzureSendManager_SolarTemps;
 
 
+            static SensorValue[] _sensorValueArr = new SensorValue[8];
+            static SensorValue[] _sensorValueArr_last_1 = new SensorValue[8];
+            static SensorValue[] _sensorValueArr_last_2 = new SensorValue[8];
+
+            static SensorValue[] _sensorValueArr_Out = new SensorValue[8];
+       
 
 
 
@@ -405,11 +502,17 @@ namespace Cobra_III_Rfm69_Test01
             }
 
           //  caCerts = new X509Certificate[] { new X509Certificate(caAllnet), new X509Certificate(caAzure), new X509Certificate(caSparkPost) };
-          //  caCerts = new X509Certificate[] { new X509Certificate(caAzure) };
+            caCerts = new X509Certificate[] { new X509Certificate(caAzure) };
 
             #region Set some Presets for Azure Table and others
 
-            //myCloudStorageAccount = new CloudStorageAccount(myAzureAccount, myAzureKey, useHttps: Azure_useHTTPS);
+            myCloudStorageAccount = new CloudStorageAccount(myAzureAccount, myAzureKey, useHttps: Azure_useHTTPS);
+
+
+            myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Current, _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+            AzureSendManager.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
+            AzureSendManager.InitializeQueue();
+
 
             //mySolarPumpCurrentSensor = new OnOffRfm69SensorMgr(DeviceType.EMX, 6, dstOffset, dstStart, dstEnd, _partitionKeyPrefix_Solar, _location_Solar, _sensorValueHeader_Solar, _sensorValueHeader_Current, _tablePreFix_Solar, _tablePreFix_Current, "0");
             mySolarPumpCurrentSensor = new OnOffRfm69SensorMgr(DeviceType.G120, 6, dstOffset, dstStart, dstEnd, _partitionKeyPrefix_Solar, _location_Solar, _sensorValueHeader_Solar, _sensorValueHeader_Current, _tablePreFix_Solar, _tablePreFix_Current, "0");
@@ -492,7 +595,7 @@ namespace Cobra_III_Rfm69_Test01
         {
             Debug.Print("Current Signal received");
             
-            /*
+           
 
             string outString = string.Empty;
             bool forceSend = false;
@@ -504,18 +607,22 @@ namespace Cobra_III_Rfm69_Test01
             double dayMaxBefore = AzureSendManager._dayMax < 0 ? 0.00 : AzureSendManager._dayMax;
             double dayMinBefore = AzureSendManager._dayMin > 70 ? 0.00 : AzureSendManager._dayMin;
 
-            //double decimalValue = (double)e.Val_1 / 100;
+            
+            // Get Power from Fritzbox (not needed here)
+            // string solarPower = fritz.getSwitchPower(FRITZ_DEVICE_AIN_01);
+            // double decimalValue = solarPower != null ? double.Parse(solarPower) / 10000 : InValidValue;
+            //double logCurrent = ((decimalValue > 170) || (decimalValue < -40)) ? InValidValue : (decimalValue > 160) ? 160.0 : decimalValue;
 
-            // Get Power from Fritzbox
-            string solarPower = fritz.getSwitchPower(FRITZ_DEVICE_AIN_01);
+            double decimalValue = InValidValue;
+            double logCurrent = InValidValue; 
 
-            double decimalValue = solarPower != null ? double.Parse(solarPower) / 10000 : InValidValue;
-            double logCurrent = ((decimalValue > 170) || (decimalValue < -40)) ? InValidValue : (decimalValue > 160) ? 160.0 : decimalValue;
 
-            // Get Energy from Fritzbox
-            string solarEnergy = fritz.getSwitchEnergy(FRITZ_DEVICE_AIN_01);
+            // Get Energy from Fritzbox (not needed here)
+            //string solarEnergy = fritz.getSwitchEnergy(FRITZ_DEVICE_AIN_01);
+            //double solarEnergy_decimal_value = solarEnergy != null ? double.Parse(solarEnergy) / 100 : InValidValue;
 
-            double solarEnergy_decimal_value = solarEnergy != null ? double.Parse(solarEnergy) / 100 : InValidValue;
+            double solarEnergy_decimal_value = InValidValue;
+
 
 
             double t4_decimal_value = (double)e.Val_2 / 100;      // measuredPower
@@ -531,8 +638,8 @@ namespace Cobra_III_Rfm69_Test01
 #if DebugPrint
             Debug.Print("Rfm69 event, Data: " + decimalValue.ToString("f2") + " Amps " + t4_decimal_value.ToString("f2") + " Watt " + t5_decimal_value.ToString("f2") + " KWh");
 #endif
-
-            activateWatchdogIfAllowedAndNotYetRunning();
+            // RoSchmi
+            //activateWatchdogIfAllowedAndNotYetRunning();
 
             #region Preset some table parameters like Row Headers
             // Here we set some table parameters which where transmitted in the eventhandler and were set in the constructor of the RF_433_Receiver Class
@@ -670,11 +777,16 @@ namespace Cobra_III_Rfm69_Test01
                         AzureSendManager._dayMinWork = t5_decimal_value;  // measuredWork
                     }
 
+                    /*
                     AzureSendManager._dayMaxSolarWork = solarEnergy_decimal_value;     // measuredSolarWork
                     if (AzureSendManager._dayMinSolarWork < 0.1)
                     {
                         AzureSendManager._dayMinSolarWork = solarEnergy_decimal_value;  // measuredSolarWork
                     }
+                    */
+                    AzureSendManager._dayMaxSolarWork = 0.0;
+                    AzureSendManager._dayMinSolarWork = 0.0;
+
 
 
                     if ((decimalValue > AzureSendManager._dayMax) && (decimalValue < 70.0))
@@ -944,7 +1056,7 @@ namespace Cobra_III_Rfm69_Test01
                 source = new LogContent() { logOrigin = "Event: RF 433 Signal received", logReason = "n", logPosition = "End of method", logNumber = 1 };
                 SdLoggerService.LogEventHourly("Normal", source);
 #endif
-        */
+        
         }
 
         #endregion
@@ -1101,5 +1213,128 @@ namespace Cobra_III_Rfm69_Test01
 
         }
         #endregion
+
+        #region _Print_Debug
+        private static void _Print_Debug(string message)
+        {
+            //lock (theLock1)
+            //{
+            switch (_AzureDebugMode)
+            {
+                //Do nothing             
+                case AzureStorageHelper.DebugMode.NoDebug:
+                    break;
+
+                //Output Debugging info to the serial port
+                case AzureStorageHelper.DebugMode.SerialDebug:
+
+                    //Convert the message to bytes
+                    /*
+                    byte[] message_buffer = System.Text.Encoding.UTF8.GetBytes(message);
+                    _debug_port.Write(message_buffer,0,message_buffer.Length);
+                    */
+                    break;
+
+                //Print message to the standard debug output
+                case AzureStorageHelper.DebugMode.StandardDebug:
+#if DebugPrint
+                        Debug.Print(message);
+#endif
+                    break;
+            }
+            //}
+        }
+        #endregion
+
+        #region Event myAzureSendManager_AzureCommandSend (Callback indicating e.g. that the Current entity was sent
+        static void myAzureSendManager_AzureCommandSend(AzureSendManager sender, AzureSendManager.AzureSendEventArgs e)
+        {
+            try { GHI.Processor.Watchdog.ResetCounter(); }
+            catch { };
+
+            if (e.decrementThreadCounter && (_azureSendThreads > 0))
+            { _azureSendThreads--; }
+
+            if (e.azureCommandWasSent)
+            {
+                _Print_Debug("Row was sent");
+                _Print_Debug("Count of AzureSendThreads = " + _azureSendThreads);
+                if ((e.returnCode == HttpStatusCode.Created) || (e.returnCode == HttpStatusCode.NoContent))
+                {
+#if SD_Card_Logging
+                        var source_1 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "o.k.", logPosition = "HttpStatusCode: " + e.returnCode.ToString(), logNumber = e.Code };
+                        SdLoggerService.LogEventHourly("Normal", source_1);
+#endif
+                    waitForCurrentCallback.Set();
+                    _azureSends++;
+                }
+                else
+                {
+#if SD_Card_Logging
+                        var source_2 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "n", logPosition = "Bad HttpStatusCode: " + e.returnCode.ToString(), logNumber = e.Code };
+                        SdLoggerService.LogEventHourly("Error", source_2);
+#endif
+                    _azureSendErrors++;
+                }
+            }
+            else
+            {
+#if SD_Card_Logging
+                    LogContent source_3 = null;
+                    switch (e.Code)
+                    {
+                        case 7:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "No Connection", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 8:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "one try failed", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 2:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "Object to early", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 1:
+                            {
+                                var source_4 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "Buffer was empty", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                SdLoggerService.LogEventHourly("Normal", source_4);
+                                break;
+                            }
+                        case 9:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "3 tries failed", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 5:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "Failed to create Table", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        default:
+                            { }
+                            break;
+                    }
+                    if (source_3 != null)
+                    {
+                        SdLoggerService.LogEventHourly("Error", source_3);
+                    }
+#endif
+
+                _Print_Debug("Count of AzureSendThreads = " + _azureSendThreads);
+            }
+
+            Debug.Print("AsyncCallback from Rfm69 Current Data send Thread: " + e.Message);
+
+#if SD_Card_Logging
+                var source = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "n", logPosition = "End of method. Count of Threads = " + _azureSendThreads, logNumber = 2 };
+                SdLoggerService.LogEventHourly("Normal", source);
+#endif
+        }
+        #endregion
+
     }
 }
