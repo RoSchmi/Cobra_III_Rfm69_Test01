@@ -7,7 +7,7 @@
 
 
 
-//#define DebugPrint
+#define DebugPrint
 
 
 #region Region Using directives
@@ -111,13 +111,15 @@ namespace Cobra_III_Rfm69_Test01
             // if time has elapsed, the acutal entry in the SampleValueBuffer is sent to azure, otherwise it is neglected (here: 1 sec, so it is always sended)
 
             //private static TimeSpan sendInterval = new TimeSpan(0, 10, 0); // If this time interval has expired since the last sending to azure,
-            private static TimeSpan sendInterval = new TimeSpan(0, 0, 30); // If this time interval has expired since the last sending to azure
+            //private static TimeSpan sendInterval = new TimeSpan(0, 0, 30); // If this time interval has expired since the last sending to azure
             // the acutal entry in the SampleValueBuffer is sent to azure, otherwise it is neglected
         
             //private static TimeSpan sendInterval_Burner = new TimeSpan(0, 0, 1); // If this time interval has expired since the last sending to azure,         
             //private static TimeSpan sendInterval_Boiler = new TimeSpan(0, 0, 1);
             //private static TimeSpan sendInterval_Solar = new TimeSpan(0, 0, 1);
             private static TimeSpan sendInterval_Current = new TimeSpan(0, 0, 1);
+            private static TimeSpan sendInterval_Froggit = new TimeSpan(0, 10, 0);
+
             //private static TimeSpan sendInterval_SolarTemps = new TimeSpan(0, 0, 1);
 
             // RoSchmi
@@ -140,8 +142,8 @@ namespace Cobra_III_Rfm69_Test01
 
             // You can select what kind of Debug.Print messages are sent
 
-            //public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.StandardDebug;
-            public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.NoDebug;
+            public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.StandardDebug;
+            //public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.NoDebug;
             public static AzureStorageHelper.DebugLevel _AzureDebugLevel = AzureStorageHelper.DebugLevel.DebugAll;
 
             // To use Fiddler as WebProxy set attachFiddler = true and set the proper IPAddress and port
@@ -200,65 +202,58 @@ namespace Cobra_III_Rfm69_Test01
             // A second table is generated, the name of this table is augmented with the suffix "Days" and the actual year (e.g. TestDays2018)
             //
 
-
-            private static string _tablePreFix = "House";     // Preset, is replaced by a value received in the sensor eventhandler
-
-            private static string _partitionKey = "Y2_";   // Preset, can be replaced with a value received in the sensor eventhandler       
             // if augmentPartitionKey == true, the actual year and month are added, e.g. Y_2016_07
             private static bool augmentPartitionKey = true;
             
-            private static string _location = "RoofTop";              // Preset, can be replaced with a value received in the sensor eventhandler
-
-            private static string _sensorValueHeader = "Temperature";    // Preset for the header of measured value, can replaced with a value received in the sensor eventhandler
-            private static string _socketSensorHeader = "Current";  // Prest for the header of second value (sensor of the power socket), can be replaced in the event handler
+            
 
 
             //private static string _tablePreFix_Burner = "Brenner";          // Preset, comes in the sensor eventhandler
             //private static string _tablePreFix_Boiler = "BoilerHeizung";    // Preset, comes in the sensor eventhandle
             private static string _tablePreFix_Solar = "Solar";             // Preset, comes in the sensor eventhandle
             private const string _tablePreFix_Current = "Current";         // Preset, comes in the sensor eventhandle
+            private const string _tablePreFix_Froggit = "TempHum";         // Preset, comes in the sensor eventhandle
             //private const string _tablePreFix_SolarTemps = "SolarTemps";    // Preset, comes in the sensor eventhandle
 
-
+      
          
-          private const string _tablePreFix_Definition_3 = "SolarTemps";   // Preset, doesn't come in the sensor eventhandle
+            private const string _tablePreFix_Definition_3 = "SolarTemps";   // Preset, doesn't come in the sensor eventhandle
 
 
 
-          // Preset for the partitionKey of the table entities.        
-          //private static string _partitionKeyPrefix_Burner = "Y3_";   // Preset, comes in the sensor eventhandler
-          //private static string _partitionKeyPrefix_Boiler = "Y3_";
-          private static string _partitionKeyPrefix_Solar = "Y3_";
-          private static string _partitionKey_Current = "Y2_";
-
+            // Preset for the partitionKey of the table entities.        
+            //private const string _partitionKeyPrefix_Burner = "Y3_";   // Preset, comes in the sensor eventhandler
+            //private const string _partitionKeyPrefix_Boiler = "Y3_";
+            private const string _partitionKeyPrefix_Solar = "Y3_";
+            private const string _partitionKey_Current = "Y2_";
+            private const string _partitionKeyPrefix_Froggit = "Y3_";
 
         
-
-       
-
-       //private static string _location_Burner = "Heizung";              // Preset, can be replaced with a value received in the sensor eventhandler
-       //private static string _location_Boiler = "Heizung";
-       private static string _location_Solar = "Heizung";
-       private static string _location_Current = "Keller";
+            //private const string _location_Burner = "Heizung";              // Preset, can be replaced with a value received in the sensor eventhandler
+            //private const string _location_Boiler = "Heizung";
+            private const string _location_Solar = "Heizung";
+            private const string _location_Current = "Keller";
+            private const string _location_Froggit = "Keller";
 
      
 
-    //private static string _sensorValueHeader_Burner = "OnOff";
-    //private static string _sensorValueHeader_Boiler = "OnOff";
-    private static string _sensorValueHeader_Solar = "OnOff";
-    private static string _sensorValueHeader_Current = "T_0";
-    //private static string _sensorValueHeader_SolarTemps = "Coll";
+            //private const string _sensorValueHeader_Burner = "OnOff";
+            //private const string _sensorValueHeader_Boiler = "OnOff";
+            private const string _sensorValueHeader_Solar = "OnOff";
+            private const string _sensorValueHeader_Current = "T_0";
+            private const string _sensorValueHeader_Froggit = "Temps";
+            //private const string _sensorValueHeader_SolarTemps = "Coll";
 
 
 
-    //private static string _socketSensorHeader_Burner = "";  // (not used in this App)
-    //private static string _socketSensorHeader_Boiler = "";  // (not used in this App)
-    //private static string _socketSensorHeader_Solar = "";  // (not used in this App)
-    private static string _socketSensorHeader_Current = "Current";
-    private static string _socketSensorHeader_SolarTemps = "ST";
+            //private const string _socketSensorHeader_Burner = "";  // (not used in this App)
+            //private const string _socketSensorHeader_Boiler = "";  // (not used in this App)
+            //private const string _socketSensorHeader_Solar = "";  // (not used in this App)
+            private const string _socketSensorHeader_Current = "Current";
+            private const string _socketSensorHeader_Froggit = "NU";
+            //private const string _socketSensorHeader_SolarTemps = "ST";
+           
             
-
-
             #endregion
 
     static bool _useRF_433_Receiver = false;       //if true the NoName RF_433_Receiver is used as the "Priority Sensor"
@@ -353,6 +348,7 @@ namespace Cobra_III_Rfm69_Test01
             private const double switchHysteresisHigh = 5.0;
 
             static AutoResetEvent waitForCurrentCallback = new AutoResetEvent(false);
+            static AutoResetEvent waitForTempHumCallback = new AutoResetEvent(false);
 
 
             public static SDCard SD;
@@ -384,7 +380,7 @@ namespace Cobra_III_Rfm69_Test01
             private static bool _willRebootAfterNextEvent = false;
 
             private static DateTime _timeOfLastSend = DateTime.Now;
-            private static DateTime _timeOfLastSensorEvent = DateTime.Now;
+            private static DateTime _timeOfLastArduinoSensorEvent = DateTime.Now;
 
             private static string _lastResetCause;
 
@@ -443,6 +439,8 @@ namespace Cobra_III_Rfm69_Test01
             //private static AzureSendManager_Burner myAzureSendManager_Burner;
             //private static AzureSendManager_Boiler myAzureSendManager_Boiler;
             //private static AzureSendManager_Solar myAzureSendManager_Solar;
+
+            private static AzureSendManager_Froggit myAzureSendManager_Froggit;
             private static AzureSendManager myAzureSendManager;
             //private static AzureSendManager_SolarTemps myAzureSendManager_SolarTemps;
 
@@ -696,16 +694,24 @@ namespace Cobra_III_Rfm69_Test01
             myCloudStorageAccount = new CloudStorageAccount(myAzureAccount, myAzureKey, useHttps: Azure_useHTTPS);
 
 
+            //myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Current, _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+
+            //myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix, _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
             myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Current, _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
-            //AzureSendManager.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
-            //AzureSendManager.InitializeQueue();
+            AzureSendManager.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
+            AzureSendManager.InitializeQueue();
+            
+            
+            myAzureSendManager_Froggit = new AzureSendManager_Froggit(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Froggit, _sensorValueHeader_Froggit, _socketSensorHeader_Froggit, caCerts, DateTime.Now, sendInterval_Froggit, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+            AzureSendManager_Froggit.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
+            AzureSendManager_Froggit.InitializeQueue();
 
             /*********************************************/
 
             //Initialize sensorValueArray (for values coming from connected arduino via modbus)
             for (int i = 0; i < 8; i++)
             {
-                _sensorValueArr[i] = new SensorValue(_timeOfLastSensorEvent, 0, 0, 0, 0, InValidValue, 999, 0x00, false);
+                _sensorValueArr[i] = new SensorValue(_timeOfLastArduinoSensorEvent, 0, 0, 0, 0, InValidValue, 999, 0x00, false);
             }
 
             //_sensorPollingTimer = new Timer(new TimerCallback(_sensorPollingTimer_Tick), cls, _sensorPollingTimerInterval, _sensorPollingTimerInterval);
@@ -1056,7 +1062,9 @@ namespace Cobra_III_Rfm69_Test01
 
                     // If there was no acutalization in a certain timespan, the sensor values are set to invalid
                     //if (DateTime.Now - _sensorValueArr[i].LastNetmfTime > makeInvalidTimeSpan)
-                    if (DateTime.Now - _sensorValueArr[i].LastNetmfTime > (makeInvalidTimeSpan < sendInterval ? makeInvalidTimeSpan : sendInterval))
+                    // RoSchmi
+                    //if (DateTime.Now - _sensorValueArr[i].LastNetmfTime > (makeInvalidTimeSpan < sendInterval ? makeInvalidTimeSpan : sendInterval))
+                    if (DateTime.Now - _sensorValueArr[i].LastNetmfTime > (makeInvalidTimeSpan < sendInterval_Froggit ? makeInvalidTimeSpan : sendInterval_Froggit))
                     {
 
                         _sensorValueArr[i].Temp = 2518;
@@ -1065,7 +1073,7 @@ namespace Cobra_III_Rfm69_Test01
                         //_sensorValueArr[i] = new SensorValue(  , _sensorValueArr[i].Channel, _sensorValueArr[i].SensorId, _sensorValueArr[i].SampleTime, 2518, 999.9, 999, _sensorValueArr_Out[i].RandomId, batteryIsLow);
                         _sensorValueArr_Out[i] = new SensorValue(_sensorValueArr[i].LastNetmfTime, _sensorValueArr[i].Channel, _sensorValueArr[i].SensorId, _sensorValueArr_Out[i].SampleTime, _sensorValueArr[i].Temp, _sensorValueArr[i].TempDouble, _sensorValueArr[i].Hum, _sensorValueArr[i].RandomId, _sensorValueArr[i].BatteryIsLow);
                     }
-                }
+                }     // End of the 'for (int i = 0; i < 8; i++)' loop
             }
             catch (Exception ex)
             {
@@ -1101,9 +1109,11 @@ namespace Cobra_III_Rfm69_Test01
                     int theIntTempValueTimesTwo = ((int)theRoundedDecTemp * 2) & 8191;
 
 
-                    //var theResult = new SignalReceivedEventArgs(new char[1] { 'C' }, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix, "000", 0);
+                    //var theResult = new SignalReceivedEventArgs(new char[1] { 'C' }, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix_Froggit, "000", 0);
 
-                    var theResult = new SignalReceivedEventArgs(theFakeNews, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix, (Ch_1_Sel - 1).ToString(), 0);
+                    // _sensorValueHeader_Froggit
+
+                    var theResult = new SignalReceivedEventArgs(theFakeNews, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, _partitionKeyPrefix_Froggit, _location_Froggit, _sensorValueHeader_Froggit, _tablePreFix_Froggit, (Ch_1_Sel - 1).ToString(), 0);
 
                     if (!_useRF_433_Receiver)   // if the RF_433_sensor is used, signals ar not sent
                     {
@@ -1128,7 +1138,7 @@ namespace Cobra_III_Rfm69_Test01
                     _sensorValueArr[Ch_1_Sel - 1].LastNetmfTime = DateTime.Now;
                     // This is the temperature transformed to the value as ecpected by the tempSensor_SignalReceived event
                     int theIntTempValueTimesTwo = ((int)theRoundedDecTemp * 2) & 8191;
-                    var theResult = new SignalReceivedEventArgs(theFakeNews, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix, "000", 0);
+                    var theResult = new SignalReceivedEventArgs(theFakeNews, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location_Froggit, "Temperature", _tablePreFix_Froggit, "000", 0);
                     if (!_useRF_433_Receiver)   // if the RF_433_sensor is used, signals ar not sent
                     {
                         tempSensor_SignalReceived(theResult);
@@ -1247,7 +1257,7 @@ namespace Cobra_III_Rfm69_Test01
             HttpStatusCode queryEntityReturnCode = HttpStatusCode.Ambiguous;
             HttpStatusCode insertEntityReturnCode = HttpStatusCode.Ambiguous;
             ArrayList queryArrayList = new ArrayList();
-            AzureParamManager myAzureParamManager = new AzureParamManager(myCloudStorageAccount, _tablePreFix, caCerts, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+            AzureParamManager myAzureParamManager = new AzureParamManager(myCloudStorageAccount, _tablePreFix_Froggit, caCerts, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
             try { GHI.Processor.Watchdog.ResetCounter(); }
             catch { };
             for (int i = 0; i < 3; i++)
@@ -1260,7 +1270,7 @@ namespace Cobra_III_Rfm69_Test01
                     for (int c = 0; c < 3; c++)
                     {
 
-                        createTableReturnCode = myAzureParamManager.createTable(myCloudStorageAccount, _tablePreFix + "Params");
+                        createTableReturnCode = myAzureParamManager.createTable(myCloudStorageAccount, _tablePreFix_Froggit + "Params");
 
                         //if ((createTableReturnCode == HttpStatusCode.NoContent) || (createTableReturnCode == HttpStatusCode.Conflict))
                         if (createTableReturnCode == HttpStatusCode.NoContent)
@@ -1289,7 +1299,8 @@ namespace Cobra_III_Rfm69_Test01
                             propertiesAL.Add(makePropertyArray.result(property));
                             property = new TableEntityProperty("Ch02RandomId", Ch02RandomId, "Edm.String");
                             propertiesAL.Add(makePropertyArray.result(property));
-                            property = new TableEntityProperty("Interval", (sendInterval.Days * 1440 + sendInterval.Hours * 60 + sendInterval.Minutes).ToString(), "Edm.String");
+                            //property = new TableEntityProperty("Interval", (sendInterval.Days * 1440 + sendInterval.Hours * 60 + sendInterval.Minutes).ToString(), "Edm.String");
+                            property = new TableEntityProperty("Interval", (sendInterval_Froggit.Days * 1440 + sendInterval_Froggit.Hours * 60 + sendInterval_Froggit.Minutes).ToString(), "Edm.String");
                             propertiesAL.Add(makePropertyArray.result(property));
                             property = new TableEntityProperty("SwitchLevelLow", switchOnTemperaturCelsius.ToString("f1"), "Edm.String");
                             propertiesAL.Add(makePropertyArray.result(property));
@@ -1315,10 +1326,10 @@ namespace Cobra_III_Rfm69_Test01
                             string reverseDate = (10000 - actDate.Year).ToString("D4") + (12 - actDate.Month).ToString("D2") + (31 - actDate.Day).ToString("D2")
                                 + (23 - actDate.Hour).ToString("D2") + (59 - actDate.Minute).ToString("D2") + (59 - actDate.Second).ToString("D2");
 
-                            ParamEntity myParamEntity = new ParamEntity(_tablePreFix + "Params", reverseDate, propertiesAL);
+                            ParamEntity myParamEntity = new ParamEntity(_tablePreFix_Froggit + "Params", reverseDate, propertiesAL);
                             string insertEtag = null;
 
-                            insertEntityReturnCode = myAzureParamManager.insertTableEntity(myCloudStorageAccount, _tablePreFix + "Params", myParamEntity, out insertEtag);
+                            insertEntityReturnCode = myAzureParamManager.insertTableEntity(myCloudStorageAccount, _tablePreFix_Froggit + "Params", myParamEntity, out insertEtag);
 #if DebugPrint
                                 Debug.Print("Standard Parameters were written to Azure");
 #endif
@@ -1339,7 +1350,7 @@ namespace Cobra_III_Rfm69_Test01
             {
 
                 var entityHashtable = queryArrayList[0] as Hashtable;
-                if (entityHashtable["PartitionKey"].ToString() == _tablePreFix + "Params")
+                if (entityHashtable["PartitionKey"].ToString() == _tablePreFix_Froggit + "Params")
                 {
                     lock (LockProgram)
                     {
@@ -1449,11 +1460,14 @@ namespace Cobra_III_Rfm69_Test01
                             var days = result_in_Limits / 1440;
                             var hours = (result_in_Limits - days * 1440) / 60;
                             var minutes = (result_in_Limits - days * 1440) % 60;
-                            sendInterval = new TimeSpan(days, hours, minutes, 0);
+                            //sendInterval = new TimeSpan(days, hours, minutes, 0);
+                            sendInterval_Froggit = new TimeSpan(days, hours, minutes, 0);
                         }
                         catch
                         {
-                            sendInterval = new TimeSpan(00, 10, 00);
+                            //sendInterval = new TimeSpan(00, 10, 00);
+                            sendInterval_Froggit = new TimeSpan(00, 10, 00);
+
                         }
                         try
                         {
@@ -1515,6 +1529,9 @@ namespace Cobra_III_Rfm69_Test01
         #region Event tempSensor_SignalReceived
         static void tempSensor_SignalReceived(SignalReceivedEventArgs e)
         {
+            Debug.Print("Froggit Signal received");
+
+
             #region basic rf_433_Receiver_SignalReceived eventhandler
 
             if (!_sensorPollingOccured)
@@ -1524,6 +1541,16 @@ namespace Cobra_III_Rfm69_Test01
             }
 
             string outString = string.Empty;
+           
+            string tablePreFix = e.DestinationTable;
+
+
+            // get minimal and maximal Values
+            double dayMaxBefore = AzureSendManager_Froggit._dayMax < 0 ? 0.00 : AzureSendManager_Froggit._dayMax;
+            double dayMinBefore = AzureSendManager_Froggit._dayMin > 70 ? 0.00 : AzureSendManager_Froggit._dayMin;
+
+
+
             bool degreeCelsiusSign = true;  // positive value
             double decimalValue = 0;
             string degreeCelsiusString = "???";
@@ -1603,6 +1630,12 @@ namespace Cobra_III_Rfm69_Test01
                 decimalValue = InValidValue;
             }
 
+#if DebugPrint
+            //Debug.Print("Rfm_Froggit event, Data: " + decimalValue.ToString("f2") + " Amps " + t4_decimal_value.ToString("f2") + " Watt " + t5_decimal_value.ToString("f2") + " KWh");
+            Debug.Print("Rfm_Froggit event, Data: " + decimalValue.ToString("f2") + " °C ");
+#endif
+
+
             outString = outString + bitString.Substring(0, 9) + " " + bitString.Substring(9, 15)
                         + " " + bitString.Substring(24, 5) + "  Measured Value: "
                         + degreeCelsiusString + " (+50 = " + decimalValuePlus50.ToString("f1") + ") "
@@ -1617,7 +1650,7 @@ namespace Cobra_III_Rfm69_Test01
             // ********************    End of the basic rf_433_Receiver_SignalReceived eventhandler   *******************************
             #endregion
 #if DebugPrint
-                Debug.Print("\r\nReceived reading from sensor: " + degreeCelsiusString + "  " + decimalValue.ToString("f1"));
+            Debug.Print("\r\nReceived reading from sensor: " + degreeCelsiusString + "  " + decimalValue.ToString("f1"));
 #endif
 
 
@@ -1647,7 +1680,8 @@ namespace Cobra_III_Rfm69_Test01
                 localThresholdHysteresis = ThresholdHysteresis;
                 localswitchOnTemperaturCelsius = switchOnTemperaturCelsius;
                 localswitchHysteresis = switchHysteresis;
-                localSendInterval = new TimeSpan(sendInterval.Days, sendInterval.Hours, sendInterval.Seconds, 0);
+                //localSendInterval = new TimeSpan(sendInterval.Days, sendInterval.Hours, sendInterval.Seconds, 0);
+                localSendInterval = new TimeSpan(sendInterval_Froggit.Days, sendInterval_Froggit.Hours, sendInterval_Froggit.Seconds, 0);
                 localCh_1_Sel = Ch_1_Sel;
                 localCh_2_Sel = Ch_2_Sel;
                 localCh01RandomId = Ch01RandomId;
@@ -1661,8 +1695,6 @@ namespace Cobra_III_Rfm69_Test01
             }
             #endregion
 
-            //EmailRecipientList.Clear();
-
             EmailRecipientList = new ArrayList();
             EmailRecipientList.Add(new EmailRecipientProperties(localEmailRecipient_1_Sender, localEmailRecipient_1_Recipient, localEmailRecipient_1_Name));
             if ((localEmailRecipient_2_Recipient != null) && (localEmailRecipient_2_Recipient.Length > 2))
@@ -1670,18 +1702,23 @@ namespace Cobra_III_Rfm69_Test01
                 EmailRecipientList.Add(new EmailRecipientProperties(localEmailRecipient_2_Sender, localEmailRecipient_2_Recipient, localEmailRecipient_2_Name));
             }
 
-            //activateWatchdogIfAllowedAndNotYetRunning();
+            // activateWatchdogIfAllowedAndNotYetRunning();
 
 
             AsyncGetParamsFromAzure(8000, 3);                      // Get Parameters from Azure (are used on the next send)
 
             #region Preset some table parameters like Row Headers
             // Here we set some table parameters which where transmitted in the eventhandler and were set in the constructor of the RF_433_Receiver Class
-            _tablePreFix = e.DestinationTable;
-            _partitionKey = e.SensorLabel;
-            _location = e.SensorLocation;
-            _sensorValueHeader = e.MeasuredQuantity;
-            _socketSensorHeader = "Amps";
+
+            // RoSchmi
+            //string _tablePreFix_Froggit = e.DestinationTable;
+           
+            //string _partitionKey_Froggit = e.SensorLabel;
+            string _location_Froggit = e.SensorLocation;
+            string _sensorValueHeader_Froggit = e.MeasuredQuantity;
+            string _socketSensorHeader_Froggit = Program._socketSensorHeader_Froggit;
+
+
             #endregion
 
 
@@ -1701,7 +1738,42 @@ namespace Cobra_III_Rfm69_Test01
             #endregion
 
             DateTime timeOfThisEvent = DateTime.Now;
-            _timeOfLastSensorEvent = timeOfThisEvent;    // Refresh the time of the last sensor event so that the _sensorControlTimer will be enabled to react
+            AzureSendManager_Froggit._timeOfLastSensorEvent = timeOfThisEvent;
+
+
+            // Reset _sensorControlTimer, if the timer is not reset, the board will be rebooted
+            _sensorControlTimer = new Timer(new TimerCallback(_sensorControlTimer_Tick), null, _sensorControlTimerInterval, _sensorControlTimerInterval);
+            // when no sensor events occure in a certain timespan
+
+            #region Test if timeService is running. If not, try to initialize
+            if (!timeServiceIsRunning)
+            {
+                if (DateTime.Now < new DateTime(2016, 7, 1))
+                {
+#if DebugPrint
+                    Debug.Print("Going to set the time in rf_433_Receiver_SignalReceived event");
+#endif
+                    try { GHI.Processor.Watchdog.ResetCounter(); }
+                    catch { };
+                    SetTime(timeZoneOffset, TimeServer_1, TimeServer_2);
+                    Thread.Sleep(200);
+                }
+                else
+                {
+                    timeServiceIsRunning = true;
+                }
+                if (!timeServiceIsRunning)
+                {
+#if DebugPrint
+                    Debug.Print("Sending aborted since timeservice is not running");
+#endif
+                    return;
+                }
+            }
+            #endregion
+
+
+            //_timeOfLastSensorEvent = timeOfThisEvent;    // Refresh the time of the last sensor event so that the _sensorControlTimer will be enabled to react
             // when no sensor events occure in a certain timespan
 
             #region If allowed: Switch the socket according to meusured temperature and thresholds
@@ -1873,7 +1945,7 @@ namespace Cobra_III_Rfm69_Test01
                 if (DateTime.Now < new DateTime(2016, 7, 1))
                 {
 #if DebugPrint
-                        Debug.Print("Going to set the time in rf_433_Receiver_SignalReceived event");
+                    Debug.Print("Going to set the time in rf_433_Receiver_SignalReceived event");
 #endif
                     try { GHI.Processor.Watchdog.ResetCounter(); }
                     catch { };
@@ -1887,7 +1959,7 @@ namespace Cobra_III_Rfm69_Test01
                 if (!timeServiceIsRunning)
                 {
 #if DebugPrint
-                        Debug.Print("Sending aborted since timeservice is not running");
+                    Debug.Print("Sending aborted since timeservice is not running");
 #endif
                     return;
                 }
@@ -1895,34 +1967,44 @@ namespace Cobra_III_Rfm69_Test01
             #endregion
 
             #region Do some tests with RegEx to assure that proper content is transmitted to the Azure table
-            // The regex tests can be outcommented when the _tablePreFix s valid
-            if (!_tableRegex.IsMatch(_tablePreFix))
-            { throw new NotSupportedException("Name of a table in Azure Storage must be alphanumeric [a-zA-Z0-9]"); }
 
-            if (!_tableRegex.IsMatch(_location))
-            { throw new NotSupportedException("Name of a table in Azure Storage must be alphanumeric [a-zA-Z0-9]"); }
+            RegexTest.ThrowIfNotValid(_tableRegex, new string[] { tablePreFix, _location_Froggit });
+            RegexTest.ThrowIfNotValid(_columnRegex, new string[] { _sensorValueHeader_Froggit });
 
-            if (!_tableRegex.IsMatch(_sensorValueHeader))
-            { throw new NotSupportedException("Name of a table in Azure Storage must be alphanumeric [a-zA-Z0-9]"); }
-
-            if (!_tableRegex.IsMatch(_socketSensorHeader))
-            { throw new NotSupportedException("Name of a table in Azure Storage must be alphanumeric [a-zA-Z0-9]"); }
             #endregion
 
             #region After a reboot: Read the last stored entity from Azure to actualize the counters
-            if (_iteration == 0)    // The system has rebooted: We read the last entity from the Cloud
+            if (AzureSendManager_Froggit._iteration == 0)    // The system has rebooted: We read the last entity from the Cloud
             {
+                _counters = myAzureSendManager_Froggit.ActualizeFromLastAzureRow(ref switchMessage);
+                _azureSendErrors = _counters.AzureSendErrors > _azureSendErrors ? _counters.AzureSendErrors : _azureSendErrors;
+                _azureSends = _counters.AzureSends > _azureSends ? _counters.AzureSends : _azureSends;
+                _forcedReboots = _counters.ForcedReboots > _forcedReboots ? _counters.ForcedReboots : _forcedReboots;
+                _badReboots = _counters.BadReboots > _badReboots ? _counters.BadReboots : _badReboots;
+
+                /*
+                _azureSendErrors = _counters.AzureSendErrors > _azureSendErrors ? _counters.AzureSendErrors : _azureSendErrors;
+                _azureSends = _counters.AzureSends > _azureSends ? _counters.AzureSends : _azureSends;
+                _forcedReboots = _counters.ForcedReboots > _forcedReboots ? _counters.ForcedReboots : _forcedReboots;
+                _badReboots = _counters.BadReboots > _badReboots ? _counters.BadReboots : _badReboots;
+                */
+
+                forceSend = true;
+                // actualize to consider the timedelay caused by reading from the cloud
+                timeOfThisEvent = DateTime.Now;
+                AzureSendManager_Froggit._timeOfLastSensorEvent = timeOfThisEvent;
+
+                /*
                 QueryLastRow(ref switchMessage);
                 forceSend = true;
                 Thread.Sleep(3000);
+                */
             }
             #endregion
 
             // when every sample value shall be sent to Azure, remove the outcomment of the next two lines
             //forceSend = true;                 
             //switchMessage = "Sending was forced by Program";
-
-            _iteration++;
 
             #region Check if we still have enough free ram (memory leak in https) and evtl. prepare for resetting the mainboard
             uint remainingRam = Debug.GC(false);            // Get remaining Ram because of the memory leak in https
@@ -1934,14 +2016,24 @@ namespace Cobra_III_Rfm69_Test01
             }
             #endregion
 
-            TimeSpan timeFromLastSend = timeOfThisEvent - _timeOfLastSend;
+            DateTime copyTimeOfLastSend = AzureSendManager._timeOfLastSend;
+
+            TimeSpan timeFromLastSend = timeOfThisEvent - copyTimeOfLastSend;
 
             double daylightCorrectOffset = DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true);
+
+
+            // TimeSpan timeFromLastSend = timeOfThisEvent - _timeOfLastSend;
+
+            // double daylightCorrectOffset = DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true);
 
             //TimeSpan timeFromLastSend = timeOfThisEvent.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)) - _timeOfLastSend;
 
             #region Set the partitionKey
-            string partitionKey = _partitionKey;                    // Set Partition Key for Azure storage table
+            
+            string partitionKey = e.SensorLabel;
+
+            // Set Partition Key for Azure storage table
             if (augmentPartitionKey == true)                        // if wanted, augment with year and month (12 - month for right order)
             //{ partitionKey = partitionKey + DateTime.Now.ToString("yyyy") + "-" + X_Stellig.Zahl((12 - DateTime.Now.Month).ToString(), 2); }
             { partitionKey = partitionKey + DateTime.Now.AddMinutes(daylightCorrectOffset).ToString("yyyy") + "-" + X_Stellig.Zahl((12 - DateTime.Now.AddMinutes(daylightCorrectOffset).Month).ToString(), 2); }
@@ -1954,163 +2046,218 @@ namespace Cobra_III_Rfm69_Test01
             #endregion
 
             #region If sendInterval has expired, write new sample value row to the buffer and start writing to Azure
-            if ((timeFromLastSend > sendInterval) || forceSend)
+            if ((timeFromLastSend > AzureSendManager_Froggit._sendInterval) || forceSend)
             {
                 #region actualize the values of minumum and maximum measurements of the day
 
-
-                if (_timeOfLastSend.AddMinutes(daylightCorrectOffset).Day == timeOfThisEvent.AddMinutes(daylightCorrectOffset).Day)
+                if (AzureSendManager_Froggit._timeOfLastSend.AddMinutes(daylightCorrectOffset).Day == timeOfThisEvent.AddMinutes(daylightCorrectOffset).Day)
                 {
-                    if ((decimalValue > _dayMax) && (decimalValue < 70.0))
+                    // same day as event before
+                    // RoSchmi
+                    AzureSendManager_Froggit._dayMaxWorkBefore = AzureSendManager_Froggit._dayMaxWork;
+                    AzureSendManager_Froggit._dayMinWorkBefore = AzureSendManager_Froggit._dayMinWork;
+                    AzureSendManager_Froggit._dayMaxSolarWorkBefore = AzureSendManager_Froggit._dayMaxSolarWork;
+                    AzureSendManager_Froggit._dayMinSolarWorkBefore = AzureSendManager_Froggit._dayMinSolarWork;
+
+                    Debug.Print(AzureSendManager._dayMaxWork.ToString("F4"));
+                    Debug.Print(AzureSendManager._dayMaxWorkBefore.ToString("F4"));
+
+
+                    //AzureSendManager_Froggit._dayMaxWork = t5_decimal_value;     // measuredWork
+                    AzureSendManager_Froggit._dayMaxWork = 55.5; 
+
+                    if (AzureSendManager_Froggit._dayMinWork < 0.1)
                     {
-                        _dayMax = decimalValue;
+                        AzureSendManager_Froggit._dayMinWorkBefore = AzureSendManager._dayMinWork;
+                        //AzureSendManager_Froggit._dayMinWork = t5_decimal_value;  // measuredWork
+                        AzureSendManager_Froggit._dayMinWork = 55.6;  // measuredWork
                     }
-                    if ((decimalValue > -39.0) && (decimalValue < _dayMin))
+
+                    /*
+                    AzureSendManager._dayMaxSolarWork = solarEnergy_decimal_value;     // measuredSolarWork
+                    if (AzureSendManager._dayMinSolarWork < 0.1)
                     {
-                        _dayMin = decimalValue;
+                        AzureSendManager._dayMinSolarWork = solarEnergy_decimal_value;  // measuredSolarWork
                     }
-                }
-                else
-                {
-                    if ((decimalValue > -39.0) && (decimalValue < 70.0))
-                        _dayMax = decimalValue;
-                    _dayMin = decimalValue;
-                }
-                #endregion
+                    */
+                    AzureSendManager_Froggit._dayMaxSolarWork = 0.0;
+                    AzureSendManager_Froggit._dayMinSolarWork = 0.0;
 
-                _lastValue = decimalValue;
 
-                SampleValue theRow = new SampleValue("House", partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax,
-                 _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_6_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_6_Sel - 1].RandomId, _sensorValueArr_Out[Ch_6_Sel - 1].Hum, _sensorValueArr_Out[Ch_6_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_7_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_7_Sel - 1].RandomId, _sensorValueArr_Out[Ch_7_Sel - 1].Hum, _sensorValueArr_Out[Ch_7_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_8_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_8_Sel - 1].RandomId, _sensorValueArr_Out[Ch_8_Sel - 1].Hum, _sensorValueArr_Out[Ch_8_Sel - 1].BatteryIsLow,
-                   actCurrent, switchState, _location, timeFromLastSend, 0, e.RSSI, _iteration, remainingRam, _forcedReboots, _badReboots, _azureSendErrors, willReboot ? 'X' : '.', forceSend, forceSend ? switchMessage : "");
 
-                /*
-                SampleValue theRow = new SampleValue(partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax,
-                   _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_6_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_6_Sel - 1].RandomId, _sensorValueArr_Out[Ch_6_Sel - 1].Hum, _sensorValueArr_Out[Ch_6_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_7_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_7_Sel - 1].RandomId, _sensorValueArr_Out[Ch_7_Sel - 1].Hum, _sensorValueArr_Out[Ch_7_Sel - 1].BatteryIsLow,
-                   _sensorValueArr_Out[Ch_8_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_8_Sel - 1].RandomId, _sensorValueArr_Out[Ch_8_Sel - 1].Hum, _sensorValueArr_Out[Ch_8_Sel - 1].BatteryIsLow,
-                   actCurrent, switchState, _location, timeFromLastSend, e.RSSI, _iteration, remainingRam, _forcedReboots, _badReboots, _azureSendErrors, willReboot ? 'X' : '.', forceSend, forceSend ? switchMessage : "");
-                */
-                if (_iteration == 1)
-                {
-                    if (timeFromLastSend < (makeInvalidTimeSpan < sendInterval ? makeInvalidTimeSpan : sendInterval))   // after reboot for the first time take values which were read back from the Cloud
+                    if ((decimalValue > AzureSendManager_Froggit._dayMax) && (decimalValue < 70.0))
                     {
-                        //theRow.T_0 = _lastTemperature[Ch_1_Sel - 1];
-                        theRow.T_1 = _lastTemperature[Ch_2_Sel - 1];
-                        theRow.T_2 = _lastTemperature[Ch_3_Sel - 1];
-                        theRow.T_3 = _lastTemperature[Ch_4_Sel - 1];
-                        theRow.T_4 = _lastTemperature[Ch_5_Sel - 1];
-                        theRow.T_5 = _lastTemperature[Ch_6_Sel - 1];
-                        theRow.T_6 = _lastTemperature[Ch_7_Sel - 1];
-                        theRow.T_7 = _lastTemperature[Ch_8_Sel - 1];
+                        AzureSendManager_Froggit._dayMax = decimalValue;
+                    }
+                    if ((decimalValue > -39.0) && ((decimalValue < AzureSendManager_Froggit._dayMin)) || AzureSendManager_Froggit._dayMin < 0.001)
+                    {
+                        AzureSendManager_Froggit._dayMin = decimalValue;
+                    }
+
+
+                    /*
+                    if (_timeOfLastSend.AddMinutes(daylightCorrectOffset).Day == timeOfThisEvent.AddMinutes(daylightCorrectOffset).Day)
+                    {
+                        if ((decimalValue > _dayMax) && (decimalValue < 70.0))
+                        {
+                            _dayMax = decimalValue;
+                        }
+                        if ((decimalValue > -39.0) && (decimalValue < _dayMin))
+                        {
+                            _dayMin = decimalValue;
+                        }
                     }
                     else
                     {
-                        //theRow.T_0 = InValidValue;
-                        theRow.T_1 = InValidValue;
-                        theRow.T_2 = InValidValue;
-                        theRow.T_3 = InValidValue;
-                        theRow.T_4 = InValidValue;
-                        theRow.T_5 = InValidValue;
-                        theRow.T_6 = InValidValue;
-                        theRow.T_7 = InValidValue;
+                        if ((decimalValue > -39.0) && (decimalValue < 70.0))
+                            _dayMax = decimalValue;
+                        _dayMin = decimalValue;
                     }
-                }
+                     * */
+                #endregion
 
-                if (AzureSendManager.hasFreePlaces())
-                {
+                    _lastValue = decimalValue;
+
+                    //tablePreFix + DateTime.Now.Year
+
+                    AzureSendManager_Froggit._iteration++;
+
+                    SampleValue theRow = new SampleValue(tablePreFix + DateTime.Now.Year, partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax,
+                     _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_6_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_6_Sel - 1].RandomId, _sensorValueArr_Out[Ch_6_Sel - 1].Hum, _sensorValueArr_Out[Ch_6_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_7_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_7_Sel - 1].RandomId, _sensorValueArr_Out[Ch_7_Sel - 1].Hum, _sensorValueArr_Out[Ch_7_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_8_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_8_Sel - 1].RandomId, _sensorValueArr_Out[Ch_8_Sel - 1].Hum, _sensorValueArr_Out[Ch_8_Sel - 1].BatteryIsLow,
+                       actCurrent, switchState, _location_Froggit, timeFromLastSend, 0, e.RSSI, AzureSendManager_Froggit._iteration, remainingRam, _forcedReboots, _badReboots, _azureSendErrors, willReboot ? 'X' : '.', forceSend, forceSend ? switchMessage : "");
+
+                    /*
+                    SampleValue theRow = new SampleValue(partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax,
+                       _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_6_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_6_Sel - 1].RandomId, _sensorValueArr_Out[Ch_6_Sel - 1].Hum, _sensorValueArr_Out[Ch_6_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_7_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_7_Sel - 1].RandomId, _sensorValueArr_Out[Ch_7_Sel - 1].Hum, _sensorValueArr_Out[Ch_7_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_8_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_8_Sel - 1].RandomId, _sensorValueArr_Out[Ch_8_Sel - 1].Hum, _sensorValueArr_Out[Ch_8_Sel - 1].BatteryIsLow,
+                       actCurrent, switchState, _location, timeFromLastSend, e.RSSI, _iteration, remainingRam, _forcedReboots, _badReboots, _azureSendErrors, willReboot ? 'X' : '.', forceSend, forceSend ? switchMessage : "");
+                    */
+                    if (AzureSendManager_Froggit._iteration == 1)
+                    {
+                        //if (timeFromLastSend < (makeInvalidTimeSpan < sendInterval ? makeInvalidTimeSpan : sendInterval))   // after reboot for the first time take values which were read back from the Cloud
+                        if (timeFromLastSend < (makeInvalidTimeSpan < sendInterval_Froggit ? makeInvalidTimeSpan : sendInterval_Froggit))   // after reboot for the first time take values which were read back from the Cloud
+                        {
+                            //theRow.T_0 = _lastTemperature[Ch_1_Sel - 1];
+                            theRow.T_1 = _lastTemperature[Ch_2_Sel - 1];
+                            theRow.T_2 = _lastTemperature[Ch_3_Sel - 1];
+                            theRow.T_3 = _lastTemperature[Ch_4_Sel - 1];
+                            theRow.T_4 = _lastTemperature[Ch_5_Sel - 1];
+                            theRow.T_5 = _lastTemperature[Ch_6_Sel - 1];
+                            theRow.T_6 = _lastTemperature[Ch_7_Sel - 1];
+                            theRow.T_7 = _lastTemperature[Ch_8_Sel - 1];
+                        }
+                        else
+                        {
+                            //theRow.T_0 = InValidValue;
+                            theRow.T_1 = InValidValue;
+                            theRow.T_2 = InValidValue;
+                            theRow.T_3 = InValidValue;
+                            theRow.T_4 = InValidValue;
+                            theRow.T_5 = InValidValue;
+                            theRow.T_6 = InValidValue;
+                            theRow.T_7 = InValidValue;
+                        }
+                    }
+
+                    //waitForCurrentCallback.Reset();
+                    waitForTempHumCallback.Reset();
+                    //waitForCurrentCallback.WaitOne(50000, true);
+                    waitForTempHumCallback.WaitOne(50000, true);
+
+                    Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager_Froggit Thread to finish
                     AzureSendManager.EnqueueSampleValue(theRow);
-                    _timeOfLastSend = timeOfThisEvent;
-                    //Debug.Print("\r\nRow was writen to the Buffer. Number of rows in the buffer = " + AzureSendManager.Count + ", still " + (AzureSendManager.capacity - AzureSendManager.Count).ToString() + " places free");
-                }
-                // optionally send message to Debug.Print  
-                //SampleValue theReturn = AzureSendManager.PreViewNextSampleValue();
-                //DateTime thatTime = theReturn.TimeOfSample;
-                //double thatDouble = theReturn.TheSampleValue;
-                //Debug.Print("The Temperature: " + thatDouble.ToString() + "  at: " + thatTime.ToString());
+
+                    if (AzureSendManager_Froggit.hasFreePlaces())
+                    {
+                        AzureSendManager_Froggit.EnqueueSampleValue(theRow);
+                        _timeOfLastSend = timeOfThisEvent;
+                        //Debug.Print("\r\nRow was writen to the Buffer. Number of rows in the buffer = " + AzureSendManager.Count + ", still " + (AzureSendManager.capacity - AzureSendManager.Count).ToString() + " places free");
+                    }
+                    // optionally send message to Debug.Print  
+                    //SampleValue theReturn = AzureSendManager.PreViewNextSampleValue();
+                    //DateTime thatTime = theReturn.TimeOfSample;
+                    //double thatDouble = theReturn.TheSampleValue;
+                    //Debug.Print("The Temperature: " + thatDouble.ToString() + "  at: " + thatTime.ToString());
 
             #endregion
 
-                #region ligth a multicolour led asynchronously to indicate action
+                    #region ligth a multicolour led asynchronously to indicate action
 #if MulticolorLed
                 myMulticolorLedAsync.light("green", 3000);
 #endif
-                #endregion
+                    #endregion
 
-                #region If sendInterval has expired, send contents of the buffer to Azure
-                if (_azureSendThreads == 0)
-                {
+                    #region If sendInterval has expired, send contents of the buffer to Azure
+                    if (_azureSendThreads == 0)
+                    {
 
-                    _azureSendThreads++;
+                        _azureSendThreads++;
 
-                    //RoSchmi
-                    //myAzureSendManager = new AzureSendManager(myCloudStorageAccount, _tablePreFix, _sensorValueHeader, _socketSensorHeader, caCerts, _timeOfLastSend, sendInterval, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+                        myAzureSendManager_Froggit = new AzureSendManager_Froggit(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Froggit, _sensorValueHeader_Froggit, _socketSensorHeader_Froggit, caCerts, DateTime.Now, sendInterval_Froggit, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+                        //AzureSendManager_Froggit.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
+                       
+                       
+                        myAzureSendManager_Froggit.AzureCommandSend += myAzureSendManager_Froggit_AzureCommandSend;
 
-                    myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Current, _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
-                    AzureSendManager.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
-                    AzureSendManager.InitializeQueue();
+                        try { GHI.Processor.Watchdog.ResetCounter(); }
+                        catch { };
+                        _Print_Debug("\r\nRow was sent on its way to Azure");
+                        myAzureSendManager_Froggit.Start();
 
-
-                   
-                    myAzureSendManager.AzureCommandSend += myAzureSendManager_AzureCommandSend;
-                    try { GHI.Processor.Watchdog.ResetCounter(); }
-                    catch { };
-                    _Print_Debug("\r\nRow was sent on its way to Azure");
-                    myAzureSendManager.Start();
-
-                }
-                else
-                {
-                    _azureSendThreadResetCounter++;
+                    }
+                    else
+                    {
+                        _azureSendThreadResetCounter++;
 #if DebugPrint
                         Debug.Print("_azureSendThreadResetCounter = " + _azureSendThreadResetCounter.ToString());
 #endif
-                    if (_azureSendThreadResetCounter > 5)   // when _azureSendThread != 0 we write the next 5 rows coming through sensor events only to the buffer
-                    // this should give outstanding requests time to finish
-                    // then we reset the counters
-                    {
-                        _azureSendThreadResetCounter = 0;
-                        _azureSendThreads = 0;
+                        if (_azureSendThreadResetCounter > 5)   // when _azureSendThread != 0 we write the next 5 rows coming through sensor events only to the buffer
+                        // this should give outstanding requests time to finish
+                        // then we reset the counters
+                        {
+                            _azureSendThreadResetCounter = 0;
+                            _azureSendThreads = 0;
+                        }
                     }
                 }
-            }
-            else
-            {
+                else
+                {
 #if MulticolorLed
                 myMulticolorLedAsync.light("red", 200);
 #endif
 #if DebugPrint
                     Debug.Print("\r\nRow was discarded, sendInterval was not expired ");
 #endif
-            }
+                }
 #if DebugPrint
                 Debug.Print("\r\nRemaining Ram:" + remainingRam.ToString() + "\r\n");
 #endif
-                #endregion
+                    #endregion
 
-            #region Prepare rebooting of the mainboard e.g. if not enough ram due to memory leak
-            if (_willRebootAfterNextEvent)
-            {
+                #region Prepare rebooting of the mainboard e.g. if not enough ram due to memory leak
+                if (_willRebootAfterNextEvent)
+                {
 #if DebugPrint
                     Debug.Print("Board is going to reboot in 3000 ms\r\n");
 #endif
-                Microsoft.SPOT.Hardware.PowerState.RebootDevice(true, 3000);
-            }
-            if (willReboot)
-            { _willRebootAfterNextEvent = true; }
-            #endregion
+                    Microsoft.SPOT.Hardware.PowerState.RebootDevice(true, 3000);
+                }
+                if (willReboot)
+                { _willRebootAfterNextEvent = true; }
+                #endregion
 #if DisplayN18
             displayN18.Clear();
             displayN18.Orientation = GTM.Module.DisplayModule.DisplayOrientation.Clockwise90Degrees;
@@ -2124,6 +2271,99 @@ namespace Cobra_III_Rfm69_Test01
                 SdLoggerService.LogEventHourly("Normal", source);
 #endif
 
+
+            }
+        }
+
+        static void myAzureSendManager_Froggit_AzureCommandSend(AzureSendManager_Froggit sender, AzureSendManager_Froggit.AzureSendEventArgs e)
+        {
+           
+            try { GHI.Processor.Watchdog.ResetCounter(); }
+            catch { };
+
+            if (e.decrementThreadCounter && (_azureSendThreads > 0))
+            { _azureSendThreads--; }
+
+            if (e.azureCommandWasSent)
+            {
+                _Print_Debug("Row was sent");
+                _Print_Debug("Count of AzureSendThreads = " + _azureSendThreads);
+                if ((e.returnCode == HttpStatusCode.Created) || (e.returnCode == HttpStatusCode.NoContent))
+                {
+#if SD_Card_Logging
+                        var source_1 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "o.k.", logPosition = "HttpStatusCode: " + e.returnCode.ToString(), logNumber = e.Code };
+                        SdLoggerService.LogEventHourly("Normal", source_1);
+#endif
+                    //waitForCurrentCallback.Set();
+
+                    waitForTempHumCallback.Set();
+                    _azureSends++;
+                }
+                else
+                {
+#if SD_Card_Logging
+                        var source_2 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "n", logPosition = "Bad HttpStatusCode: " + e.returnCode.ToString(), logNumber = e.Code };
+                        SdLoggerService.LogEventHourly("Error", source_2);
+#endif
+                    _azureSendErrors++;
+                }
+            }
+            else
+            {
+#if SD_Card_Logging
+                    LogContent source_3 = null;
+                    switch (e.Code)
+                    {
+                        case 7:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "No Connection", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 8:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "one try failed", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 2:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "Object to early", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 1:
+                            {
+                                var source_4 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "Buffer was empty", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                SdLoggerService.LogEventHourly("Normal", source_4);
+                                break;
+                            }
+                        case 9:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "3 tries failed", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        case 5:
+                            {
+                                source_3 = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "Failed to create Table", logPosition = "HttpStatusCode ambiguous: " + e.returnCode.ToString(), logNumber = e.Code };
+                                break;
+                            }
+                        default:
+                            { }
+                            break;
+                    }
+                    if (source_3 != null)
+                    {
+                        SdLoggerService.LogEventHourly("Error", source_3);
+                    }
+#endif
+
+                _Print_Debug("Count of AzureSendThreads = " + _azureSendThreads);
+            }
+
+            Debug.Print("AsyncCallback from Rfm69 Froggit send Thread: " + e.Message);
+
+#if SD_Card_Logging
+                var source = new LogContent() { logOrigin = "Event: Azure command sent", logReason = "n", logPosition = "End of method. Count of Threads = " + _azureSendThreads, logNumber = 2 };
+                SdLoggerService.LogEventHourly("Normal", source);
+#endif
 
         }
         #endregion
@@ -2171,7 +2411,7 @@ namespace Cobra_III_Rfm69_Test01
         #endregion
 
 
-        #region Event SolarPumpSolarTempsDataSensor_SignalReceived
+        #region Event SolarPumpSolarTempsDataSensor_SignalReceived   (not used in this App)
         static void mySolarPumpCurrentSensor_rfm69SolarTempsDataSensorSend(OnOffRfm69SensorMgr sender, OnOffRfm69SensorMgr.DataSensorEventArgs e)
         {
             Debug.Print("SolarTemps Signal received");
@@ -2238,10 +2478,10 @@ namespace Cobra_III_Rfm69_Test01
 
             //_tablePreFix_Current = e.DestinationTable;
 
-            _partitionKey_Current = e.SensorLabel;
-            _location_Current = e.SensorLocation;
-            _sensorValueHeader_Current = e.MeasuredQuantity;
-            _socketSensorHeader_Current = "NU";
+            string _partitionKey_Current = e.SensorLabel;
+            string _location_Current = e.SensorLocation;
+            string _sensorValueHeader_Current = e.MeasuredQuantity;
+            
             #endregion
 
 
@@ -2578,8 +2818,7 @@ namespace Cobra_III_Rfm69_Test01
                         Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager Thread to finish
                         AzureSendManager.EnqueueSampleValue(theRow);
 
-                        // RoSchmi
-                        //myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, e.DestinationTable + "Days", "Work", _socketSensorHeader_Current, caCerts, timeOfThisEvent, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+                       
                         myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, e.DestinationTable + "Days", _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, timeOfThisEvent, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
 
 
@@ -2935,6 +3174,7 @@ namespace Cobra_III_Rfm69_Test01
         #endregion
 
         #region Method QueryLastRow()
+        /*
         private static void QueryLastRow(ref string pSwitchMessage)
         {
 #if DebugPrint
@@ -2947,7 +3187,7 @@ namespace Cobra_III_Rfm69_Test01
             //RoSchmi
             //myAzureSendManager = new AzureSendManager(myCloudStorageAccount, _tablePreFix, _sensorValueHeader, _socketSensorHeader, caCerts, _timeOfLastSend, sendInterval, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
 
-            myAzureSendManager = new AzureSendManager(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Current, _sensorValueHeader_Current, _socketSensorHeader_Current, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
+            myAzureSendManager_Froggit = new AzureSendManager_Froggit(myCloudStorageAccount, timeZoneOffset, dstStart, dstEnd, dstOffset, _tablePreFix_Froggit, _sensorValueHeader_Froggit, _socketSensorHeader_Froggit, caCerts, DateTime.Now, sendInterval_Current, _azureSends, _AzureDebugMode, _AzureDebugLevel, IPAddress.Parse(fiddlerIPAddress), pAttachFiddler: attachFiddler, pFiddlerPort: fiddlerPort, pUseHttps: Azure_useHTTPS);
             //AzureSendManager.sampleTimeOfLastSent = DateTime.Now.AddDays(-10.0);    // Date in the past
             //AzureSendManager.InitializeQueue();
 
@@ -3029,9 +3269,8 @@ namespace Cobra_III_Rfm69_Test01
             //forceSend = true;                  // after reboot the row is sent independent of sendinterval expired
             pSwitchMessage += _lastResetCause;
         }
+        */
         #endregion
-
-
 
         #region _Print_Debug
         private static void _Print_Debug(string message)

@@ -32,6 +32,7 @@
     <Compile Include="AzureParamManager.cs" />
     <Compile Include="AzureSendManager.cs" />
     <Compile Include="AzureSendManagerBase.cs" />
+    <Compile Include="AzureSendManager_Froggit.cs" />
     <Compile Include="Counters.cs" />
     <Compile Include="FixedTimeService.cs" />
     <Compile Include="GenerateUniqueMacAddr.cs" />
