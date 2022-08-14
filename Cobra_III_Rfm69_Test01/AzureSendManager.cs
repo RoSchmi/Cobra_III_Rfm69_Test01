@@ -639,7 +639,8 @@ using RoSchmi.DayLihtSavingTime;
 
                 if ((insertEntityReturnCode == HttpStatusCode.Created) || (insertEntityReturnCode == HttpStatusCode.NoContent) || (insertEntityReturnCode == HttpStatusCode.Conflict))
                 {
-                    //Debug.Print("Entity was inserted. Try: " + loopCtr.ToString() + " HttpStatusCode: " + insertEntityReturnCode.ToString());
+                    // RoSchmi
+                    Debug.Print("Entity was inserted. Try: " + loopCtr.ToString() + " HttpStatusCode: " + insertEntityReturnCode.ToString());
 
                     nextSampleValue = DequeueNextSampleValue();
                     Thread.Sleep(0);

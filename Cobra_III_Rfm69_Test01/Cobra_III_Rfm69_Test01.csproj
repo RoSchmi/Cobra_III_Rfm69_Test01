@@ -29,6 +29,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AzureParamManager.cs" />
     <Compile Include="AzureSendManager.cs" />
     <Compile Include="AzureSendManagerBase.cs" />
     <Compile Include="Counters.cs" />
@@ -38,6 +39,7 @@
     <Compile Include="OnOffRfm69SensorMgr.cs" />
     <Compile Include="OnOffSample.cs" />
     <Compile Include="OnOffSampleBase.cs" />
+    <Compile Include="ParamEntity.cs" />
     <Compile Include="PervasiveDigital\Security\ManagedProviders\HMACSHA256.cs" />
     <Compile Include="PervasiveDigital\Security\ManagedProviders\IHashAlgorithm.cs" />
     <Compile Include="PervasiveDigital\Security\ManagedProviders\Sha2.cs" />
@@ -62,10 +64,16 @@
     <Compile Include="RoSchmi\Net\Azure\Storage\TableClient.cs" />
     <Compile Include="RoSchmi\Net\Azure\Storage\TableEntity.cs" />
     <Compile Include="RoSchmi\Net\Azure\Storage\TableEntityProperty.cs" />
+    <Compile Include="RoSchmi\Net\SparkPost\EmailRecipientProperties.cs" />
+    <Compile Include="RoSchmi\Net\SparkPost\SparkPostAccount.cs" />
+    <Compile Include="RoSchmi\Net\SparkPost\SparkPostBasicHttpWebResponse.cs" />
+    <Compile Include="RoSchmi\Net\SparkPost\SparkPostHttpWebClient.cs" />
+    <Compile Include="RoSchmi\Net\SparkPost\SparkPostHttpWebRequestHelper.cs" />
     <Compile Include="RoSchmi\Utilities\Reform_uint16_2_float32.cs" />
     <Compile Include="SampleHoldValue.cs" />
     <Compile Include="SampleValue.cs" />
     <Compile Include="SensorValue.cs" />
+    <Compile Include="SignalReceivedEvemtArgs.cs" />
     <Compile Include="TempEntity.cs" />
     <Compile Include="X_Stellig.cs" />
   </ItemGroup>
@@ -76,6 +84,7 @@
     <Reference Include="MFDpwsExtensions" />
     <Reference Include="Microsoft.SPOT.Graphics" />
     <Reference Include="Microsoft.SPOT.Hardware" />
+    <Reference Include="Microsoft.SPOT.Hardware.SerialPort" />
     <Reference Include="Microsoft.SPOT.IO" />
     <Reference Include="Microsoft.SPOT.Native" />
     <Reference Include="Microsoft.SPOT.Net" />
@@ -85,6 +94,7 @@
     <Reference Include="System" />
     <Reference Include="System.Http" />
     <Reference Include="System.IO" />
+    <Reference Include="System.Net.Security" />
     <Reference Include="System.Security" />
     <Reference Include="System.Text.RegularExpressions" />
     <Reference Include="System.Xml" />
