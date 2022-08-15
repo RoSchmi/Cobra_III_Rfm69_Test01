@@ -51,8 +51,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="RegexTest.cs" />
     <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RFM69_NETMF.cs" />
@@ -124,6 +124,7 @@
   <ItemGroup>
     <None Include="Resources\AzureAccountKey.txt" />
     <None Include="Resources\DigiCert Baltimore Root.cer" />
+    <None Include="Resources\DigiCertGlobalRootG2.cer" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AzureAccountName.txt" />

@@ -124,10 +124,10 @@
   <data name="AzureAccountName" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\AzureAccountName.txt;System.String, mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null;Windows-1252</value>
   </data>
+  <data name="DigiCertGlobalRootG2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>Resources\DigiCertGlobalRootG2.cer;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
   <data name="DigiCert_Baltimore_Root" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Resources\DigiCert Baltimore Root.cer;System.Byte[], mscorlib, Version=4.3.1.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="String1" xml:space="preserve">
-    <value>Hello World!</value>
   </data>
 </root>

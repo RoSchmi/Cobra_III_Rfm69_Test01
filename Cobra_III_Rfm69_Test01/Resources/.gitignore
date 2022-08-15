@@ -3,3 +3,5 @@
 ## Only include this file
 !.gitignore
 !DigiCert Baltimore Root.cer
+!DigiCertGlobalRootG2.cer
+!DigiCertGlobalRootG2.crt

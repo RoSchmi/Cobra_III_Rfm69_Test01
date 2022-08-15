@@ -554,6 +554,102 @@ using RoSchmi.DayLihtSavingTime;
                     property = new TableEntityProperty("T_1", nextSampleValue.T_0.ToString("f2"), "Edm.String");
                     propertiesAL.Add(makePropertyArray.result(property));
 
+                    property = new TableEntityProperty("H_1", nextSampleValue.H_0.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_2", nextSampleValue.T_1.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_2", nextSampleValue.H_1.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_3", nextSampleValue.T_2.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_3", nextSampleValue.H_2.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_4", nextSampleValue.T_3.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_4", nextSampleValue.H_3.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_5", nextSampleValue.T_4.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_5", nextSampleValue.H_4.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_6", nextSampleValue.T_5.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_6", nextSampleValue.H_5.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_7", nextSampleValue.T_6.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_7", nextSampleValue.H_6.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    /*
+                    property = new TableEntityProperty("T_8", nextSampleValue.T_7.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("H_8", nextSampleValue.H_7.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    */
+                    property = new TableEntityProperty(_socketSensorHeader, nextSampleValue.SecondReport, "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("Status", nextSampleValue.Status, "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("Location", nextSampleValue.Location, "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("SampleTime", nextSampleValue.TimeOfSample.ToString() + " " + TimeOffsetUTCString, "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("TimeFromLast", nextSampleValue.TimeFromLast.Days.ToString("D3") + "-" + nextSampleValue.TimeFromLast.Hours.ToString("D2") + ":" + nextSampleValue.TimeFromLast.Minutes.ToString("D2") + ":" + nextSampleValue.TimeFromLast.Seconds.ToString("D2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("Info", nextSampleValue.SendInfo.ToString("D4"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("RSSI", nextSampleValue.RSSI.ToString("D3"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("Iterations", nextSampleValue.Iterations.ToString("D6"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("Sends", _azureSends.ToString("D6"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("RemainRam", nextSampleValue.RemainingRam.ToString("D7"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("forcedReboots", nextSampleValue.ForcedReboots.ToString("D6"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("badReboots", nextSampleValue.BadReboots.ToString("D6"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("sendErrors", nextSampleValue.SendErrors.ToString("D4"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("bR", nextSampleValue.BootReason.ToString(), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("fS", nextSampleValue.ForceSend ? "X" : ".", "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+                    property = new TableEntityProperty("Message", nextSampleValue.Message.ToString(), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    /*
+                    //Add properties to ArrayList (Name, Value, Type)
+                    property = new TableEntityProperty(_sensorValueHeader, nextSampleValue.TheSampleValue.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("min", nextSampleValue.DayMin.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("max", nextSampleValue.DayMax.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
+                    property = new TableEntityProperty("T_1", nextSampleValue.T_0.ToString("f2"), "Edm.String");
+                    propertiesAL.Add(makePropertyArray.result(property));
+
 
                     property = new TableEntityProperty("T_2", nextSampleValue.T_1.ToString("f2"), "Edm.String");
                     propertiesAL.Add(makePropertyArray.result(property));
@@ -608,6 +704,8 @@ using RoSchmi.DayLihtSavingTime;
                     propertiesAL.Add(makePropertyArray.result(property));
                     property = new TableEntityProperty("Message", nextSampleValue.Message.ToString(), "Edm.String");
                     propertiesAL.Add(makePropertyArray.result(property));
+                     */
+
                 }
                 #endregion
 

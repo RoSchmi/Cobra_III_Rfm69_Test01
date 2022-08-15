@@ -38,12 +38,12 @@ namespace Cobra_III_Rfm69_Test01
         {
             AzureAccountName = -17596,
             AzureAccountKey = -13890,
-            String1 = 1228,
         }
         [System.SerializableAttribute()]
         internal enum BinaryResources : short
         {
             DigiCert_Baltimore_Root = -10335,
+            DigiCertGlobalRootG2 = 26599,
         }
     }
 }

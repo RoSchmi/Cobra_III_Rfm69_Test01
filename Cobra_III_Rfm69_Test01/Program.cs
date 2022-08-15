@@ -3,11 +3,14 @@
 // Hardware: GHI Cobra III Mainboard, Enc28 Ethernet module 
 // Dieses Programm dient zur Registrierung der gemessenen Stromwerte eines Smartmeters
 // sowie der Messung von Temperaturen und der relativen Luftfeutigkeit
+//
+// Zur gesicherten Datenübertragung via https an Azure muss 'Azure_useHTTPS' auf true gesetzt werden.
+// Außerdem muss mittels des Programms MFDeploy die ssl seed des Boards einmalig gesetzt werden
 
 
 
 
-#define DebugPrint
+//#define DebugPrint
 
 
 #region Region Using directives
@@ -142,8 +145,8 @@ namespace Cobra_III_Rfm69_Test01
 
             // You can select what kind of Debug.Print messages are sent
 
-            public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.StandardDebug;
-            //public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.NoDebug;
+            //public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.StandardDebug;
+            public static AzureStorageHelper.DebugMode _AzureDebugMode = AzureStorageHelper.DebugMode.NoDebug;
             public static AzureStorageHelper.DebugLevel _AzureDebugLevel = AzureStorageHelper.DebugLevel.DebugAll;
 
             // To use Fiddler as WebProxy set attachFiddler = true and set the proper IPAddress and port
@@ -422,6 +425,7 @@ namespace Cobra_III_Rfm69_Test01
 
             // Certificate of Azure, included as a Resource
             static byte[] caAzure = Resources.GetBytes(Resources.BinaryResources.DigiCert_Baltimore_Root);
+            static byte[] caAzureNeu = Resources.GetBytes(Resources.BinaryResources.DigiCertGlobalRootG2);
 
             // See -https://blog.devmobile.co.nz/2013/03/01/https-with-netmf-http-client-managing-certificates/ how to include a certificate
 
@@ -465,7 +469,7 @@ namespace Cobra_III_Rfm69_Test01
         #endregion
         public static void Main()
         {
-            Debug.Print(Resources.GetString(Resources.StringResources.String1));
+           // Debug.Print(Resources.GetString(Resources.StringResources.String1));
 
             //OurClass cls = new OurClass();
 
@@ -658,7 +662,10 @@ namespace Cobra_III_Rfm69_Test01
             }
 
           //  caCerts = new X509Certificate[] { new X509Certificate(caAllnet), new X509Certificate(caAzure), new X509Certificate(caSparkPost) };
-            caCerts = new X509Certificate[] { new X509Certificate(caAzure) };
+          //caCerts = new X509Certificate[] { new X509Certificate(caAzure) };
+          //caCerts = new X509Certificate[] { new X509Certificate(caAzureNeu) };
+
+           caCerts = new X509Certificate[] { new X509Certificate(caAzure), new X509Certificate(caAzureNeu)};
 
             int timeOutMs = 100000;    // Wait for Timeserver Response
             long startTicks = Microsoft.SPOT.Hardware.Utility.GetMachineTime().Ticks;
@@ -2177,7 +2184,7 @@ namespace Cobra_III_Rfm69_Test01
                     //waitForCurrentCallback.WaitOne(50000, true);
                     waitForTempHumCallback.WaitOne(50000, true);
 
-                    Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager_Froggit Thread to finish
+                    //Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager_Froggit Thread to finish
                     AzureSendManager.EnqueueSampleValue(theRow);
 
                     if (AzureSendManager_Froggit.hasFreePlaces())
@@ -2815,7 +2822,7 @@ namespace Cobra_III_Rfm69_Test01
                         waitForCurrentCallback.Reset();
                         waitForCurrentCallback.WaitOne(50000, true);
 
-                        Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager Thread to finish
+                        //Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager Thread to finish
                         AzureSendManager.EnqueueSampleValue(theRow);
 
                        
