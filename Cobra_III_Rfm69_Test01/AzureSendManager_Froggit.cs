@@ -341,8 +341,9 @@ using RoSchmi.DayLihtSavingTime;
                             _lastContent[Ch_5_Sel - 1] = double.Parse(entityHashtable["T_5"].ToString());
                             _lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
                             _dayMinWorkBefore = _dayMinWork;
-                            _dayMinWork = _lastContent[Ch_6_Sel - 1];
+                            //_dayMinWork = _lastContent[Ch_6_Sel - 1];
 
+                            _dayMinWork = _lastContent[Ch_1_Sel - 1];
                         }
                         catch { }
                     }
@@ -362,7 +363,9 @@ using RoSchmi.DayLihtSavingTime;
                             _lastContent[Ch_5_Sel - 1] = double.Parse(entityHashtable["T_5"].ToString());
                             _lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
                             _dayMinWorkBefore = _dayMinWork;
-                            _dayMinWork = _lastContent[Ch_6_Sel - 1];
+                            //_dayMinWork = _lastContent[Ch_6_Sel - 1];
+                            _dayMinWork = _lastContent[Ch_1_Sel - 1];
+
                         }
                         catch { }
                     }
