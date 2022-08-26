@@ -6,7 +6,17 @@ namespace Cobra_III_Rfm69_Test01
     public class SampleValue
     {
        
-        public SampleValue(string pTableName, string pPartitionKey, DateTime pTimeOfSample, int pTimeOffsetUTC, double pSampleValue, double pDayMin, double pDayMax, double pT_0, byte pID_0, UInt16 pH_0, bool pLo_0, double pT_1, byte pID_1, UInt16 pH_1, bool pLo_1, double pT_2, byte pID_2, UInt16 pH_2, bool pLo_2, double pT_3, byte pID_3, UInt16 pH_3, bool pLo_3, double pT_4, byte pID_4, UInt16 pH_4, bool pLo_4, double pT_5, byte pID_5, UInt16 pH_5, bool pLo_5, double pT_6, byte pID_6, UInt16 pH_6, bool pLo_6, double pT_7, byte pID_7, UInt16 pH_7, bool pLo_7, string pSecondReport, string pStatus, string pLocation, TimeSpan ptimeFromLast, UInt16 pSendInfo, int pRSSI, int pIterations, uint pRemainingRam, int pforcedReboots, int pbadReboots, int pSendErrors, char pBootReason, bool pForceSend, string pMessage)
+        public SampleValue(string pTableName, string pPartitionKey, DateTime pTimeOfSample, int pTimeOffsetUTC, double pSampleValue,
+            double pDayMin, double pDayMax, double pT_0, byte pID_0, UInt16 pH_0, 
+            bool pLo_0, double pT_1, byte pID_1, UInt16 pH_1, bool pLo_1, 
+            double pT_2, byte pID_2, UInt16 pH_2, bool pLo_2, double pT_3, 
+            byte pID_3, UInt16 pH_3, bool pLo_3, double pT_4, byte pID_4,
+            UInt16 pH_4, bool pLo_4, double pT_5, byte pID_5, UInt16 pH_5, 
+            bool pLo_5, double pT_6, byte pID_6, UInt16 pH_6, bool pLo_6, 
+            double pT_7, byte pID_7, UInt16 pH_7, bool pLo_7, string pSecondReport, 
+            string pStatus, string pLocation, TimeSpan ptimeFromLast, UInt16 pSendInfo, int pRSSI, 
+            int pIterations, uint pRemainingRam, int pforcedReboots, int pbadReboots, int pSendErrors, 
+            char pBootReason, bool pForceSend, string pMessage)
         {
             this.TableName = pTableName;
             this.PartitionKey = pPartitionKey;

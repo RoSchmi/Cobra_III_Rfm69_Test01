@@ -1,7 +1,7 @@
 // Cobra_III_Rfm69_Test01 Program Copyright RoSchmi 2022 License Apache 2.0,  Version 1.1.0 vom 13.08.2022, 
 // NETMF 4.3, GHI SDK 2016 R1
 // Hardware: GHI Cobra III Mainboard, Enc28 Ethernet module 
-// Dieses Programm dient zur Registrierung der gemessenen Stromwerte eines Smartmeters
+// Dieses Programm dient zur Registrierung der gemessenen Stromwerte eines Smartmeters Eastron SDM530 bzw. SDM630
 // sowie der Messung von Temperaturen und der relativen Luftfeutigkeit
 //
 // Zur gesicherten Datenübertragung via https an Azure muss 'Azure_useHTTPS' auf true gesetzt werden.
@@ -10,7 +10,7 @@
 
 
 
-//#define DebugPrint
+#define DebugPrint
 
 
 #region Region Using directives
@@ -773,192 +773,12 @@ namespace Cobra_III_Rfm69_Test01
                 //_Led.Write(false);
                 Thread.Sleep(200);
             }    
-
         }
-
-
-        #region sensorPollingTimer_Tick - Gets Temperatur samples from the Arduino/Medusa Mini Board   (Cobra_III_Version)
-        /*
-        static void _sensorPollingTimer_Tick(object o)
-        {
-            // Set timer interval to a very long value
-            _sensorPollingTimer.Change(new TimeSpan(0, 0, 2, 0), new TimeSpan(0, 0, 2, 0));
-
-            try
-            {
-                ushort[] holdingRegResult = _modbusMaster.ReadHoldingRegisters(0x11, 0x0000, 40);
-                for (int i = 0; i < 8; i++)
-                {
-                    //holdingRegResult[i * 5 + 1] = 0x8000;
-                    UInt32 newSampleTime = (UInt32)(holdingRegResult[i * 5 + 1] << 16) + holdingRegResult[i * 5 + 2];
-                    bool batteryIsLow = (newSampleTime & 0x80000000) != 0;
-                    newSampleTime = newSampleTime & 0x7FFFFFF;
-
-                    if (_sensorValueArr[i].SampleTime != newSampleTime)
-                    {
-                        //_sensorValueArr[i] = new SensorValue(DateTime.Now, (byte)(holdingRegResult[i * 5] >> 8), (byte)(holdingRegResult[i * 5] & 0x00FF), newSampleTime, holdingRegResult[i * 5 + 3], holdingRegResult[i * 5 + 4]);                           
-                        try
-                        {
-                            _sensorValueArr_last_2[i] = new SensorValue(_sensorValueArr_last_1[i].LastNetmfTime, _sensorValueArr_last_1[i].Channel, _sensorValueArr_last_1[i].SensorId, _sensorValueArr_last_1[i].SampleTime, _sensorValueArr_last_1[i].Temp, _sensorValueArr_last_1[i].TempDouble, _sensorValueArr_last_1[i].Hum, _sensorValueArr_last_1[i].RandomId, _sensorValueArr[i].BatteryIsLow);
-                        }
-                        catch { };
-                        try
-                        {
-                            _sensorValueArr_last_1[i] = new SensorValue(_sensorValueArr[i].LastNetmfTime, _sensorValueArr[i].Channel, _sensorValueArr[i].SensorId, _sensorValueArr[i].SampleTime, _sensorValueArr[i].Temp, _sensorValueArr[i].TempDouble, _sensorValueArr[i].Hum, _sensorValueArr[i].RandomId, _sensorValueArr[i].BatteryIsLow);
-                        }
-                        catch { };
-
-                        //_sensorValueArr[i] = new SensorValue(DateTime.Now, (byte)(holdingRegResult[i * 5] >> 8), (byte)(holdingRegResult[i * 5] & 0x00FF), newSampleTime, holdingRegResult[i * 5 + 3], (System.Math.Round((holdingRegResult[i * 5 + 3] - 720) * 0.556)) / 10, holdingRegResult[i * 5 + 4]);
-                        //_sensorValueArr[i] = new SensorValue(DateTime.Now, (byte)(holdingRegResult[i * 5] >> 8), (byte)(holdingRegResult[i * 5] & 0x00FF), newSampleTime, holdingRegResult[i * 5 + 3], (System.Math.Round((holdingRegResult[i * 5 + 3] - 720) * 0.556)) / 10, (ushort)(holdingRegResult[i * 5 + 4] & 0x00FF), (byte)(holdingRegResult[i * 5 + 4] >> 8));
-
-
-                        _sensorValueArr[i] = new SensorValue(DateTime.Now, (byte)(holdingRegResult[i * 5] >> 8), (byte)(holdingRegResult[i * 5] & 0x00FF), newSampleTime, holdingRegResult[i * 5 + 3], (System.Math.Round((holdingRegResult[i * 5 + 3] - 720) * 0.556)) / 10, (ushort)(holdingRegResult[i * 5 + 4] & 0x00FF), (byte)(holdingRegResult[i * 5 + 4] >> 8), batteryIsLow);
-
-                    }
-
-                    if (_randomIdSnapping)
-                    {
-                        if (ChRandomId[i] != "0" && (_sensorValueArr[i].RandomId.ToString() != ChRandomId[i]))   // retrieve last values
-                        {
-                            _sensorValueArr[i] = new SensorValue(_sensorValueArr_last_1[i].LastNetmfTime, _sensorValueArr_last_1[i].Channel, _sensorValueArr_last_1[i].SensorId, _sensorValueArr_last_1[i].SampleTime, _sensorValueArr_last_1[i].Temp, _sensorValueArr_last_1[i].TempDouble, _sensorValueArr_last_1[i].Hum, _sensorValueArr_last_1[i].RandomId, _sensorValueArr[i].BatteryIsLow);
-                        }
-                    }
-
-                    // Make a copy of the last values
-                    _sensorValueArr_Out[i] = new SensorValue(_sensorValueArr[i].LastNetmfTime, _sensorValueArr[i].Channel, _sensorValueArr[i].SensorId, _sensorValueArr[i].SampleTime, _sensorValueArr[i].Temp, _sensorValueArr[i].TempDouble, _sensorValueArr[i].Hum, _sensorValueArr[i].RandomId, _sensorValueArr[i].BatteryIsLow);
-
-#if DebugPrint
-                        //Debug.Print("Humidity is: " + _sensorValueArr_Out[i].Hum.ToString() + "  Random-Id is: " + _sensorValueArr_Out[i].RandomId.ToString());
-                        //Debug.Print("Battery Status is low: " + _sensorValueArr_Out[i].BatteryIsLow.ToString());
-#endif
-
-                    #region _handleDiscordant values
-                    */
-
-                    /*
-                        // To eliminate discordant values. When there is a deviation of more than 3 °C from the mean of the both last values
-                        // the last value is hold as the result until the last three values are close together
-                        if (_handleDiscordantValues)
-                        {
-                            if ((31 < _sensorValueArr[i].Temp && _sensorValueArr[i].Temp < 1939) && (31 < _sensorValueArr_last_1[i].Temp && _sensorValueArr_last_1[i].Temp < 1939) && (31 < _sensorValueArr_last_2[i].Temp && _sensorValueArr_last_2[i].Temp < 1939))  // Only if all values are in the allowed range
-                            {
-                                //int TempLast_2 = (int)_sensorValueArr_last_2[i].Temp;
-                                //int TempLast_1 = (int)_sensorValueArr_last_1[i].Temp;
-                                //int TempAct = (int)_sensorValueArr[i].Temp;
-                                //int AbsDiff = System.Math.Abs(((TempLast_2 + TempLast_1) / 2) - TempAct);
-
-                                //if (AbsDiff > 60)
-                                if (System.Math.Abs((((int)_sensorValueArr_last_2[i].Temp + (int)_sensorValueArr_last_1[i].Temp) / 2) - (int)_sensorValueArr[i].Temp) > 60)  // Difference may be not more than 60 ( = 3 °C)
-                                {
-                                    _sensorValueArr_Out[i].Temp = _samplHoldValues[i].Temp;
-                                    _sensorValueArr_Out[i].Hum = _samplHoldValues[i].Humid;
-                                }
-                                else
-                                {
-                                    _samplHoldValues[i] = new SampleHoldValue(_sensorValueArr[i].Temp, _sensorValueArr[i].Hum);
-                                }
-                            }
-                            else
-                            {
-                                _samplHoldValues[i] = new SampleHoldValue(_sensorValueArr[i].Temp, _sensorValueArr[i].Hum);
-                            }
-                        }
-                        */
-
-                    /*
-                    #endregion
-
-
-                    // If there was no acutalization in a certain timespan, the sensor values are set to invalid
-                    //if (DateTime.Now - _sensorValueArr[i].LastNetmfTime > makeInvalidTimeSpan)
-                    if (DateTime.Now - _sensorValueArr[i].LastNetmfTime > (makeInvalidTimeSpan < sendInterval ? makeInvalidTimeSpan : sendInterval))
-                    {
-
-                        _sensorValueArr[i].Temp = 2518;
-                        _sensorValueArr[i].TempDouble = InValidValue;
-                        _sensorValueArr[i].Hum = 999;
-                        //_sensorValueArr[i] = new SensorValue(  , _sensorValueArr[i].Channel, _sensorValueArr[i].SensorId, _sensorValueArr[i].SampleTime, 2518, 999.9, 999, _sensorValueArr_Out[i].RandomId, batteryIsLow);
-                        _sensorValueArr_Out[i] = new SensorValue(_sensorValueArr[i].LastNetmfTime, _sensorValueArr[i].Channel, _sensorValueArr[i].SensorId, _sensorValueArr_Out[i].SampleTime, _sensorValueArr[i].Temp, _sensorValueArr[i].TempDouble, _sensorValueArr[i].Hum, _sensorValueArr[i].RandomId, _sensorValueArr[i].BatteryIsLow);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.Print("Exception: " + ex.Message);
-            }
-
-
-            double theRoundedDecTemp = 700.0; // Presset with a value out of the allowed range
-            try
-            {
-                //theRoundedDecTemp = System.Math.Round((_sensorValueArr[(Ch_1_Sel < 1 ? 1 : Ch_1_Sel > 8 ? 8 : Ch_1_Sel) - 1].Temp - 720) * 0.556);
-                theRoundedDecTemp = System.Math.Round((_sensorValueArr_Out[(Ch_1_Sel < 1 ? 1 : Ch_1_Sel > 8 ? 8 : Ch_1_Sel) - 1].Temp - 720) * 0.556);
-
-            }
-            catch { }
-
-            //theRoundedDecTemp = 700.0;    // RoSchmi:  must be removed - only for tests
-
-            string theDecTempString = null;
-
-            if (!_randomIdSnapping || (ChRandomId[Ch_1_Sel - 1] == "0" || _sensorValueArr[Ch_1_Sel - 1].RandomId.ToString() == ChRandomId[Ch_1_Sel - 1]))
-            {
-                if ((theRoundedDecTemp < 690.0) && (theRoundedDecTemp > -390))  // Only values in the allowed range are transferred
-                {
-                    // This is the measured temperature as string with one decimal place 
-                    theDecTempString = (theRoundedDecTemp / 10).ToString("f1");
-
-                    // This is the temperature transformed to the value as ecpected by the tempSensor_SignalReceived event
-                    int theIntTempValueTimesTwo = ((int)theRoundedDecTemp * 2) & 8191;
-
-
-                    //var theResult = new SignalReceivedEventArgs(new char[1] { 'C' }, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix, "000", 0);
-
-                    var theResult = new SignalReceivedEventArgs(new char[1] { 'C' }, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix, (Ch_1_Sel - 1).ToString(), 0);
-
-
-                    tempSensor_SignalReceived(theResult);
-                }
-                else
-                {
-                    AsyncGetParamsFromAzure();
-                }
-            }
-            else
-            {
-                if (DateTime.Now - _sensorValueArr[Ch_1_Sel - 1].LastNetmfTime > makeInvalidTimeSpan)
-                {
-                    _sensorValueArr[Ch_1_Sel - 1].LastNetmfTime = DateTime.Now;
-                    // This is the temperature transformed to the value as ecpected by the tempSensor_SignalReceived event
-                    int theIntTempValueTimesTwo = ((int)theRoundedDecTemp * 2) & 8191;
-                    var theResult = new SignalReceivedEventArgs(new char[1] { 'C' }, true, theIntTempValueTimesTwo, DateTime.Now.AddMinutes(DayLihtSavingTime.DayLightTimeOffset(dstStart, dstEnd, dstOffset, DateTime.Now, true)), 1, 1, 1, "Y2_", _location, "Temperature", _tablePreFix, "000", 0);
-                    tempSensor_SignalReceived(theResult);
-                }
-                else
-                {
-                    AsyncGetParamsFromAzure();
-                }
-            }
-
-            if (theDecTempString != null)
-            {
-                Debug.Print("Temperature is: " + theDecTempString);
-            }
-            else
-            {
-                Debug.Print("Temperature is: ???");
-            }
-            _sensorPollingOccured = true;  //Singals that this event was fired at leat one time
-            // When everthing is done set timer interval to the original value
-            _sensorPollingTimer.Change(_sensorPollingTimerInterval, _sensorPollingTimerInterval);
-        }
-        */
-        #endregion
 
 
         //**************************************************************************************************
 
-        #region sensorPollingTimer_Tick - Gets Temperatur samples from the Arduino/Medusa Mini Board (All_433_Version)
+        #region sensorPollingTimer_Tick - Gets Temperatur samples from the Arduino/Medusa Mini Board 
         static void _sensorPollingTimer_Tick(object o)
         {
             try { GHI.Processor.Watchdog.ResetCounter(); }
@@ -1169,18 +989,11 @@ namespace Cobra_III_Rfm69_Test01
             {
                 //Debug.Print("Temperature is: ???");
             }
-            _sensorPollingOccured = true;  //Singals that this event was fired at leat one time
+            _sensorPollingOccured = true;  //Singals that this event was fired at least one time
             // When everthing is done set timer interval to the original value
             _sensorPollingTimer.Change(_sensorPollingTimerInterval, _sensorPollingTimerInterval);
         }
         #endregion
-
-
-
-
-
-
-
 
 
         #region AsyncGetParamsThread
@@ -1538,6 +1351,8 @@ namespace Cobra_III_Rfm69_Test01
         {
             Debug.Print("Froggit Signal received");
 
+            //RoSchmi
+            //return;
 
             #region basic rf_433_Receiver_SignalReceived eventhandler
 
@@ -2023,7 +1838,9 @@ namespace Cobra_III_Rfm69_Test01
             }
             #endregion
 
-            DateTime copyTimeOfLastSend = AzureSendManager._timeOfLastSend;
+            //DateTime copyTimeOfLastSend = AzureSendManager._timeOfLastSend;
+
+            DateTime copyTimeOfLastSend = AzureSendManager_Froggit._timeOfLastSend;
 
             TimeSpan timeFromLastSend = timeOfThisEvent - copyTimeOfLastSend;
 
@@ -2066,8 +1883,8 @@ namespace Cobra_III_Rfm69_Test01
                     AzureSendManager_Froggit._dayMaxSolarWorkBefore = AzureSendManager_Froggit._dayMaxSolarWork;
                     AzureSendManager_Froggit._dayMinSolarWorkBefore = AzureSendManager_Froggit._dayMinSolarWork;
 
-                    Debug.Print(AzureSendManager._dayMaxWork.ToString("F4"));
-                    Debug.Print(AzureSendManager._dayMaxWorkBefore.ToString("F4"));
+                    Debug.Print(AzureSendManager_Froggit._dayMaxWork.ToString("F4"));
+                    Debug.Print(AzureSendManager_Froggit._dayMaxWorkBefore.ToString("F4"));
 
 
                     //AzureSendManager_Froggit._dayMaxWork = t5_decimal_value;     // measuredWork
@@ -2089,8 +1906,9 @@ namespace Cobra_III_Rfm69_Test01
                     */
                     AzureSendManager_Froggit._dayMaxSolarWork = 0.0;
                     AzureSendManager_Froggit._dayMinSolarWork = 0.0;
-
-
+                }
+                else   // not the same day as event before
+                {
 
                     if ((decimalValue > AzureSendManager_Froggit._dayMax) && (decimalValue < 70.0))
                     {
@@ -2100,7 +1918,7 @@ namespace Cobra_III_Rfm69_Test01
                     {
                         AzureSendManager_Froggit._dayMin = decimalValue;
                     }
-
+                }
 
                     /*
                     if (_timeOfLastSend.AddMinutes(daylightCorrectOffset).Day == timeOfThisEvent.AddMinutes(daylightCorrectOffset).Day)
@@ -2120,7 +1938,7 @@ namespace Cobra_III_Rfm69_Test01
                             _dayMax = decimalValue;
                         _dayMin = decimalValue;
                     }
-                     * */
+                    */
                 #endregion
 
                     _lastValue = decimalValue;
@@ -2129,9 +1947,9 @@ namespace Cobra_III_Rfm69_Test01
 
                     AzureSendManager_Froggit._iteration++;
 
-                    SampleValue theRow = new SampleValue(tablePreFix + DateTime.Now.Year, partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax,
-                     _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
-                       _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
+                    SampleValue theRow = new SampleValue(tablePreFix + DateTime.Now.Year, partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, AzureSendManager_Froggit._dayMin, AzureSendManager_Froggit._dayMax,
+                        _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
+                        _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
@@ -2139,6 +1957,18 @@ namespace Cobra_III_Rfm69_Test01
                        _sensorValueArr_Out[Ch_7_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_7_Sel - 1].RandomId, _sensorValueArr_Out[Ch_7_Sel - 1].Hum, _sensorValueArr_Out[Ch_7_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_8_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_8_Sel - 1].RandomId, _sensorValueArr_Out[Ch_8_Sel - 1].Hum, _sensorValueArr_Out[Ch_8_Sel - 1].BatteryIsLow,
                        actCurrent, switchState, _location_Froggit, timeFromLastSend, 0, e.RSSI, AzureSendManager_Froggit._iteration, remainingRam, _forcedReboots, _badReboots, _azureSendErrors, willReboot ? 'X' : '.', forceSend, forceSend ? switchMessage : "");
+                    
+                    /*
+                    SampleValue theRow = new SampleValue(tablePreFix + DateTime.Now.Year, partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax, 
+                        _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_6_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_6_Sel - 1].RandomId, _sensorValueArr_Out[Ch_6_Sel - 1].Hum, _sensorValueArr_Out[Ch_6_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_7_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_7_Sel - 1].RandomId, _sensorValueArr_Out[Ch_7_Sel - 1].Hum, _sensorValueArr_Out[Ch_7_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_8_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_8_Sel - 1].RandomId, _sensorValueArr_Out[Ch_8_Sel - 1].Hum, _sensorValueArr_Out[Ch_8_Sel - 1].BatteryIsLow,
+                       actCurrent, switchState, _location_Froggit, timeFromLastSend, 0, e.RSSI, AzureSendManager_Froggit._iteration, remainingRam, _forcedReboots, _badReboots, _azureSendErrors, willReboot ? 'X' : '.', forceSend, forceSend ? switchMessage : "");
+                     */
 
                     /*
                     SampleValue theRow = new SampleValue(partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, _dayMin, _dayMax,
@@ -2183,6 +2013,7 @@ namespace Cobra_III_Rfm69_Test01
                     waitForTempHumCallback.Reset();
                     //waitForCurrentCallback.WaitOne(50000, true);
                     waitForTempHumCallback.WaitOne(50000, true);
+                    waitForTempHumCallback.WaitOne(5000, true);
 
                     //Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager_Froggit Thread to finish
                     AzureSendManager.EnqueueSampleValue(theRow);
@@ -2280,7 +2111,8 @@ namespace Cobra_III_Rfm69_Test01
 
 
             }
-        }
+        
+
 
         static void myAzureSendManager_Froggit_AzureCommandSend(AzureSendManager_Froggit sender, AzureSendManager_Froggit.AzureSendEventArgs e)
         {
@@ -2426,15 +2258,14 @@ namespace Cobra_III_Rfm69_Test01
         #endregion
 
 
-
-
         #region Event SolarPumpCurrentDataSensor_SignalReceived
         // This eventmanager is for the case when Continuous Sensordata from the Smartmeter (and Fritz!Dect) were sent
         static void mySolarPumpCurrentSensor_rfm69DataSensorSend(OnOffRfm69SensorMgr sender, OnOffRfm69SensorMgr.DataSensorEventArgs e)
         {
             Debug.Print("Current Signal received");
             
-           
+            // RoSchmi
+            return;
 
             string outString = string.Empty;
             bool forceSend = false;
@@ -2898,8 +2729,6 @@ namespace Cobra_III_Rfm69_Test01
         }
 
         #endregion
-
-
 
 
         #region Event SolarPumpOnOffSensor Signal received

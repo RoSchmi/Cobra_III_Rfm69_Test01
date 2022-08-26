@@ -61,6 +61,18 @@ using RoSchmi.DayLihtSavingTime;
         public static double _dayMinSolarWorkBefore = 0.00;
         public static double _dayMaxSolarWorkBefore = 0.00;
 
+        /*
+        public static double _dayMinCh_1 = 0.00;   //don't change
+        public static double _dayMaxCh_1 = 0.00;  //don't change
+        public static double _dayMinCh_1_Before = 0.00;
+        public static double _dayMaxCh_1_Before = 0.00;
+
+        public static double _dayMinCh_2 = 0.00;   //don't change
+        public static double _dayMaxCh_2 = 0.00;  //don't change
+        public static double _dayMinCh_2_Before = 0.00;
+        public static double _dayMaxCh_2_Before = 0.00;
+        */
+
 
         public static DateTime sampleTimeOfLastSent;  // initial value is set in ProgramStarted
         public static DateTime _timeOfLastSend;
