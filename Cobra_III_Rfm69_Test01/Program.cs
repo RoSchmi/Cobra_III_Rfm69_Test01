@@ -1,6 +1,7 @@
-// Cobra_III_Rfm69_Test01 Program Copyright RoSchmi 2022 License Apache 2.0,  Version 1.1.0 vom 13.08.2022, 
+// Cobra_III_Rfm69_Test01 Program Copyright RoSchmi 2022 License Apache 2.0,  Version 1.1.0 vom 27.08.2022, 
 // NETMF 4.3, GHI SDK 2016 R1
-// Hardware: GHI Cobra III Mainboard, Enc28 Ethernet module 
+// Hardware: GHI Cobra III Mainboard, Enc28 Ethernet module
+// Angepasst zur Verwendung in einem Wohnhaus (Nordeutschland) 
 // Dieses Programm dient zur Registrierung der gemessenen Stromwerte eines Smartmeters Eastron SDM530 bzw. SDM630
 // sowie der Messung von Temperaturen und der relativen Luftfeutigkeit mittels 433 MHz Sensoren
 //
@@ -8,7 +9,7 @@
 // Außerdem muss mittels des Programms MFDeploy die ssl seed des Boards einmalig gesetzt werden
 
 
-#define DebugPrint
+//#define DebugPrint
 
 
 #region Region Using directives
@@ -121,7 +122,7 @@ namespace Cobra_III_Rfm69_Test01
             
 
             // RoSchmi
-            //private static bool workWithWatchDog = true;    // Choose whether the App runs with WatchDog, should normally be set to true
+            //private static bool workWithWatchDog = true;    // Choose whether the App runs with WatchDog, should normally be set to true, for tests and when starting to false
             private static bool workWithWatchDog = false;
             private static int watchDogTimeOut = 50;        // WatchDog timeout in sec: Max Value for G400 15 sec, G120 134 sec, EMX 4.294 sec
             // = 50 sec, don't change without need, may not be below 30 sec 
@@ -310,7 +311,10 @@ namespace Cobra_III_Rfm69_Test01
             static TimeSpan _sensorPollingTimerInterval = new TimeSpan(0, 0, 30);  // 30 seconds
             // This timer writes to the SampleValueBuffer if new values were polled from sensors
 
-            static TimeSpan makeInvalidTimeSpan_Rfm69 = new TimeSpan(0, 5, 0);  // When this timespan has elapsed, old sensor values which come via the Rfm69 radio are set to invalid
+            //static TimeSpan makeInvalidTimeSpan_Rfm69 = new TimeSpan(0, 5, 0);  // When this timespan has elapsed, old sensor values which come via the Rfm69 radio are set to invalid
+
+            static TimeSpan makeInvalidTimeSpan_Rfm69 = new TimeSpan(2, 15, 0);  // When this timespan has elapsed, old sensor values which come via the Rfm69 radio are set to invalid
+       
             static TimeSpan makeInvalidTimeSpan_Froggit = new TimeSpan(0, 3, 0);  // When this timespan has elapsed, old sensor values of the Arduino 433 MHz receiver are set to invalid
 
             static bool _handleDiscordantValues = false;  // If true: discordant temperature values are eliminated/attenuated for some tim (see code)
@@ -471,6 +475,27 @@ namespace Cobra_III_Rfm69_Test01
            // Debug.Print(Resources.GetString(Resources.StringResources.String1));
 
             //OurClass cls = new OurClass();
+
+            #region Save last Reset Cause (Watchdog or Power/Reset)
+            _lastResetCause = " PowerOrReset";
+
+            if (GHI.Processor.Watchdog.LastResetCause == GHI.Processor.Watchdog.ResetCause.Watchdog)
+            {
+                _lastResetCause = " Watchdog";
+                Debug.Print("Last Reset Cause: Watchdog");
+            }
+            else
+            {
+                Debug.Print("Last Reset Cause: Power/Reset");
+            }
+            if (GHI.Processor.Watchdog.Enabled)
+            {
+#if DebugPrint
+                Debug.Print("Watchdog disabled");
+#endif
+                GHI.Processor.Watchdog.Disable();
+            }
+            #endregion
 
             #region Try to open SD-Card, if there is no SD-Card, doesn't matter
             try
@@ -1389,7 +1414,6 @@ namespace Cobra_III_Rfm69_Test01
         #endregion
 
 
-
         #region Event SolarPumpSolarTempsDataSensor_SignalReceived   (not used in this App)
         static void mySolarPumpCurrentSensor_rfm69SolarTempsDataSensorSend(OnOffRfm69SensorMgr sender, OnOffRfm69SensorMgr.DataSensorEventArgs e)
         {
@@ -1404,8 +1428,16 @@ namespace Cobra_III_Rfm69_Test01
         {
             Debug.Print("Current Signal received");
             
-            // RoSchmi
-            //return;
+            
+            int Ch_1_Sel = 1;   // The Channel current sensor (Values from 1 to 8 are allowed), overrides the variables with the same name in Program.
+            int Ch_2_Sel = 2;
+            int Ch_3_Sel = 3;
+            int Ch_4_Sel = 4;
+            int Ch_5_Sel = 5;
+            int Ch_6_Sel = 6;
+            int Ch_7_Sel = 7;
+            int Ch_8_Sel = 8;
+            
 
             string outString = string.Empty;
             bool forceSend = false;
@@ -1422,6 +1454,9 @@ namespace Cobra_III_Rfm69_Test01
             // string solarPower = fritz.getSwitchPower(FRITZ_DEVICE_AIN_01);
             // double decimalValue = solarPower != null ? double.Parse(solarPower) / 10000 : InValidValue;
             //double logCurrent = ((decimalValue > 170) || (decimalValue < -40)) ? InValidValue : (decimalValue > 160) ? 160.0 : decimalValue;
+
+
+
 
             double decimalValue = InValidValue;
             double logCurrent = InValidValue; 
@@ -1440,13 +1475,17 @@ namespace Cobra_III_Rfm69_Test01
 
             double t5_decimal_value = (double)Reform_uint16_2_float32.Convert((UInt16)(e.Val_3 >> 16), (UInt16)(e.Val_3 & 0x0000FFFF));  // measuredWork 
 
+            // RoSchmi 
+            // In this App we take the power consumption
+            decimalValue = t4_decimal_value;
+
 #if SD_Card_Logging
                 var source = new LogContent() { logOrigin = "Event: RF 433 Signal received", logReason = "n", logPosition = "RF 433 event Start", logNumber = 1 };
                 SdLoggerService.LogEventHourly("Normal", source);
 #endif
 
 #if DebugPrint
-            Debug.Print("Rfm69 event, Data: " + decimalValue.ToString("f2") + " Amps " + t4_decimal_value.ToString("f2") + " Watt " + t5_decimal_value.ToString("f2") + " KWh");
+            Debug.Print("Rfm69 event, Data: " + decimalValue.ToString("f2") + " Watt " + t4_decimal_value.ToString("f2") + " Watt " + t5_decimal_value.ToString("f2") + " KWh");
 #endif
             
             activateWatchdogIfAllowedAndNotYetRunning();
@@ -1576,8 +1615,8 @@ namespace Cobra_III_Rfm69_Test01
                     AzureSendManager._dayMaxSolarWorkBefore = AzureSendManager._dayMaxSolarWork;
                     AzureSendManager._dayMinSolarWorkBefore = AzureSendManager._dayMinSolarWork;
 
-                    //Debug.Print(AzureSendManager._dayMaxWork.ToString("F4"));
-                    //Debug.Print(AzureSendManager._dayMaxWorkBefore.ToString("F4"));
+                    Debug.Print(AzureSendManager._dayMaxWork.ToString("F4"));
+                    Debug.Print(AzureSendManager._dayMaxWorkBefore.ToString("F4"));
 
 
                     AzureSendManager._dayMaxWork = t5_decimal_value;     // measuredWork
@@ -1597,7 +1636,8 @@ namespace Cobra_III_Rfm69_Test01
                     AzureSendManager._dayMaxSolarWork = 0.0;
                     AzureSendManager._dayMinSolarWork = 0.0;
 
-                    if ((decimalValue > AzureSendManager._dayMax) && (decimalValue < 70.0))
+                    //if ((decimalValue > AzureSendManager._dayMax) && (decimalValue < 70.0))
+                    if ((decimalValue > AzureSendManager._dayMax) && (decimalValue < 20000.0))
                     {
                         AzureSendManager._dayMax = decimalValue;
                     }
@@ -1610,8 +1650,9 @@ namespace Cobra_III_Rfm69_Test01
                 {
                     // first event of a new day
 
-                    // decimalValue is actually gained power of solar panel
-                    if ((decimalValue > -39.0) && (decimalValue < 70.0))
+                    // decimalValue is actually the actual power consumption in Watt
+                    //if ((decimalValue > -39.0) && (decimalValue < 70.0))
+                    if ((decimalValue > -39.0) && (decimalValue < 20000.0))
                     {
                         AzureSendManager._dayMax = decimalValue;
                         AzureSendManager._dayMin = decimalValue;
@@ -1877,7 +1918,6 @@ namespace Cobra_III_Rfm69_Test01
 
         #endregion
       
-
         #region Method Finalize Volumes
         public static void FinalizeVolumes()
         {
@@ -1926,7 +1966,7 @@ namespace Cobra_III_Rfm69_Test01
                 try { GHI.Processor.Watchdog.ResetCounter(); }
                 catch { };
 #if DebugPrint
-                Debug.Print("\r\nWachdogtimer reset! " + testCounter);
+                Debug.Print("\r\nWatchdogtimer reset! " + testCounter);
 #endif
                 testCounter++;
                 //}
@@ -2505,8 +2545,6 @@ namespace Cobra_III_Rfm69_Test01
 
         }
         #endregion
-
-        // workingArea
        
         #region Event tempSensor_SignalReceived
         static void tempSensor_SignalReceived(SignalReceivedEventArgs e)
@@ -3189,8 +3227,5 @@ namespace Cobra_III_Rfm69_Test01
 
         #endregion
 
-       
-        
-       
     }
 }
