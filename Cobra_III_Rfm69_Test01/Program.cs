@@ -398,8 +398,9 @@ namespace Cobra_III_Rfm69_Test01
             private static double _dayMax = -1000.00;  //don't change
             private static double _lastValue = InValidValue;
 
-
-            private static double[] _lastTemperature = new double[8] { InValidValue, InValidValue, InValidValue, InValidValue, InValidValue, InValidValue, InValidValue, InValidValue };
+            // RoSchmi
+            // wohl überflüssig
+            //private static double[] _lastTemperature = new double[8] { InValidValue, InValidValue, InValidValue, InValidValue, InValidValue, InValidValue, InValidValue, InValidValue };
 
 
             // RoSchmi
@@ -817,6 +818,10 @@ namespace Cobra_III_Rfm69_Test01
             // Set timer interval to a very long value
             _sensorPollingTimer.Change(new TimeSpan(0, 0, 2, 0), new TimeSpan(0, 0, 2, 0));
 
+            //SensorValue[] _sensorValueArr = new SensorValue[8];
+
+            //SensorValue[] _sensorValueArr_Out = new SensorValue[8];
+
             try
             {
                 ushort[] holdingRegResult;
@@ -833,6 +838,7 @@ namespace Cobra_III_Rfm69_Test01
 
                     return;
                 }
+
                 for (int i = 0; i < 8; i++)
                 {
                     //holdingRegResult[i * 5 + 1] = 0x8000;
@@ -1437,6 +1443,8 @@ namespace Cobra_III_Rfm69_Test01
             int Ch_6_Sel = 6;
             int Ch_7_Sel = 7;
             int Ch_8_Sel = 8;
+
+            SensorValue[] _sensorValueArr_Out = new SensorValue[8]; // use local variable in this event. Todo: Try to use local variable in event from froggit sensors also
             
 
             string outString = string.Empty;
@@ -1685,7 +1693,6 @@ namespace Cobra_III_Rfm69_Test01
                 //RoSchmi
                 // T_1 : Solar Work of this day
                 _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble = ((AzureSendManager._dayMaxSolarWork - AzureSendManager._dayMinSolarWork) <= 0) ? 0.00 : AzureSendManager._dayMaxSolarWork - AzureSendManager._dayMinSolarWork;
-                // _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble = _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble <  9 ? _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble * 10 : 90.00;    // set limit to 90 and change scale
                 _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble = _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble < 9 ? _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble * 0.5 : 90.00;    // set limit to 90 and change scale
 
                 // RoSchmi
@@ -3084,8 +3091,8 @@ namespace Cobra_III_Rfm69_Test01
                     AzureSendManager_Froggit._iteration++;
 
                     SampleValue theRow = new SampleValue(tablePreFix + DateTime.Now.Year, partitionKey, e.ReadTime, timeZoneOffset + (int)daylightCorrectOffset, decimalValue, AzureSendManager_Froggit._dayMin, AzureSendManager_Froggit._dayMax,
-                        _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
-                        _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_1_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_1_Sel - 1].RandomId, _sensorValueArr_Out[Ch_1_Sel - 1].Hum, _sensorValueArr_Out[Ch_1_Sel - 1].BatteryIsLow,
+                       _sensorValueArr_Out[Ch_2_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_2_Sel - 1].RandomId, _sensorValueArr_Out[Ch_2_Sel - 1].Hum, _sensorValueArr_Out[Ch_2_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_3_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_3_Sel - 1].RandomId, _sensorValueArr_Out[Ch_3_Sel - 1].Hum, _sensorValueArr_Out[Ch_3_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_4_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_4_Sel - 1].RandomId, _sensorValueArr_Out[Ch_4_Sel - 1].Hum, _sensorValueArr_Out[Ch_4_Sel - 1].BatteryIsLow,
                        _sensorValueArr_Out[Ch_5_Sel - 1].TempDouble, _sensorValueArr_Out[Ch_5_Sel - 1].RandomId, _sensorValueArr_Out[Ch_5_Sel - 1].Hum, _sensorValueArr_Out[Ch_5_Sel - 1].BatteryIsLow,
@@ -3099,14 +3106,15 @@ namespace Cobra_III_Rfm69_Test01
                     {              
                         if (timeFromLastSend < (makeInvalidTimeSpan_Froggit < sendInterval_Froggit ? makeInvalidTimeSpan_Froggit : sendInterval_Froggit))   // after reboot for the first time take values which were read back from the Cloud
                         {
-                            //theRow.T_0 = _lastTemperature[Ch_1_Sel - 1];
-                            theRow.T_1 = _lastTemperature[Ch_2_Sel - 1];
-                            theRow.T_2 = _lastTemperature[Ch_3_Sel - 1];
-                            theRow.T_3 = _lastTemperature[Ch_4_Sel - 1];
-                            theRow.T_4 = _lastTemperature[Ch_5_Sel - 1];
-                            theRow.T_5 = _lastTemperature[Ch_6_Sel - 1];
-                            theRow.T_6 = _lastTemperature[Ch_7_Sel - 1];
-                            theRow.T_7 = _lastTemperature[Ch_8_Sel - 1];
+                            //theRow.T_0 = AzureSendManager_Froggit._lastContent[Ch_1_Sel - 1];
+                            theRow.T_1 = AzureSendManager_Froggit._lastContent[Ch_2_Sel - 1];
+                            theRow.T_2 = AzureSendManager_Froggit._lastContent[Ch_3_Sel - 1];
+                            theRow.T_3 = AzureSendManager_Froggit._lastContent[Ch_4_Sel - 1];
+                            theRow.T_4 = AzureSendManager_Froggit._lastContent[Ch_5_Sel - 1];
+                            theRow.T_5 = AzureSendManager_Froggit._lastContent[Ch_6_Sel - 1];
+                            theRow.T_6 = AzureSendManager_Froggit._lastContent[Ch_7_Sel - 1];
+                            theRow.T_7 = AzureSendManager_Froggit._lastContent[Ch_8_Sel - 1];
+
                         }
                         else
                         {
@@ -3117,7 +3125,7 @@ namespace Cobra_III_Rfm69_Test01
                             theRow.T_4 = InValidValue;
                             theRow.T_5 = InValidValue;
                             theRow.T_6 = InValidValue;
-                            theRow.T_7 = InValidValue;
+                            theRow.T_7 = InValidValue;            
                         }
                     }
 
@@ -3128,7 +3136,9 @@ namespace Cobra_III_Rfm69_Test01
                     waitForTempHumCallback.WaitOne(5000, true);
 
                     //Thread.Sleep(5000); // Wait additional 5 sec for last thread AzureSendManager_Froggit Thread to finish
-                    AzureSendManager.EnqueueSampleValue(theRow);
+
+                    // RoSchmi
+                    //AzureSendManager.EnqueueSampleValue(theRow);
 
                     if (AzureSendManager_Froggit.hasFreePlaces())
                     {

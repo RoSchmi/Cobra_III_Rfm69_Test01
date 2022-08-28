@@ -324,6 +324,21 @@ using RoSchmi.DayLihtSavingTime;
                 {
                     var entityHashtable = queryArrayList[0] as Hashtable;
                     string lastBootReason = entityHashtable["bR"].ToString();
+
+                    try
+                    {
+                        _lastContent[Ch_1_Sel - 1] = double.Parse(entityHashtable["T_1"].ToString());
+                        _lastContent[Ch_2_Sel - 1] = double.Parse(entityHashtable["T_2"].ToString());
+                        _lastContent[Ch_3_Sel - 1] = double.Parse(entityHashtable["T_3"].ToString());
+                        _lastContent[Ch_4_Sel - 1] = double.Parse(entityHashtable["T_4"].ToString());
+                        _lastContent[Ch_5_Sel - 1] = double.Parse(entityHashtable["T_5"].ToString());
+                        _lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
+                        _lastContent[Ch_7_Sel - 1] = double.Parse(entityHashtable["T_7"].ToString());
+                        _lastContent[Ch_8_Sel - 1] = double.Parse(entityHashtable["T_8"].ToString());
+                    }
+                    catch { }
+
+
                     if (lastBootReason == "X")     // reboot was forced by the program (not enougth free ram)
                     {
                         _lastResetCause = "ForcedReboot";
@@ -335,11 +350,8 @@ using RoSchmi.DayLihtSavingTime;
                             _azureSendErrors = int.Parse(entityHashtable["sendErrors"].ToString());
                             _dayMin = double.Parse(entityHashtable["min"].ToString());
                             _dayMax = double.Parse(entityHashtable["max"].ToString());
-                            _lastContent[Ch_3_Sel - 1] = double.Parse(entityHashtable["T_3"].ToString());
-                            // RoSchmi
-                            //_lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
-                            _lastContent[Ch_5_Sel - 1] = double.Parse(entityHashtable["T_5"].ToString());
-                            _lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
+
+                            
                             _dayMinWorkBefore = _dayMinWork;
                             //_dayMinWork = _lastContent[Ch_6_Sel - 1];
 
@@ -357,11 +369,8 @@ using RoSchmi.DayLihtSavingTime;
                             _azureSendErrors = int.Parse(entityHashtable["sendErrors"].ToString());
                             _dayMin = double.Parse(entityHashtable["min"].ToString());
                             _dayMax = double.Parse(entityHashtable["max"].ToString());
-                            _lastContent[Ch_3_Sel - 1] = double.Parse(entityHashtable["T_3"].ToString());
-                            // RoSchmi
-                            //_lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
-                            _lastContent[Ch_5_Sel - 1] = double.Parse(entityHashtable["T_5"].ToString());
-                            _lastContent[Ch_6_Sel - 1] = double.Parse(entityHashtable["T_6"].ToString());
+
+                            
                             _dayMinWorkBefore = _dayMinWork;
                             //_dayMinWork = _lastContent[Ch_6_Sel - 1];
                             _dayMinWork = _lastContent[Ch_1_Sel - 1];
