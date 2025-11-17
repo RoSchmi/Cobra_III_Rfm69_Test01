@@ -1,4 +1,4 @@
-// Cobra_III_Rfm69_Test01 Program Copyright RoSchmi 2022 License Apache 2.0,  Version 1.1.0 vom 27.08.2022, 
+// Cobra_III_Rfm69_Test01 Program Copyright RoSchmi 2022 License Apache 2.0,  Version 1.1.0 vom 17.11.2025, 
 // NETMF 4.3, GHI SDK 2016 R1
 // Hardware: GHI Cobra III Mainboard, Enc28 Ethernet module
 // Angepasst zur Verwendung in einem Wohnhaus (Nordeutschland) 
