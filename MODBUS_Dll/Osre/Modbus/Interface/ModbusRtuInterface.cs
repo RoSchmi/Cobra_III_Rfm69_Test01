@@ -244,27 +244,21 @@ namespace Osre.Modbus.Interface
             {
                break;
             }
-                if (_serial.BytesToRead > 0)
+            if (_serial.BytesToRead > 0)
+            {
+                if (desiredLength > 0)
                 {
-                    if (desiredLength > 0)
-                    {
-                        n += _serial.Read(buffer, n, desiredLength - n);
-                    }
-                    else
-                    {
-                        n += _serial.Read(buffer, n, buffer.Length - n);
-                    }
-                    // a delay of more than 1.5 chars means end of telegram /////, but since this is a extreme short time, we extend it by factor 2
-                    // Original
-                    //nextRead = DateTime.Now.Ticks + 6 * _halfCharLength;
-                    nextRead = DateTime.Now.Ticks + 8 * _halfCharLength;
+                    n += _serial.Read(buffer, n, desiredLength - n);
                 }
                 else
                 {
-                    int dummy5 = n;
+                    n += _serial.Read(buffer, n, buffer.Length - n);
                 }
-            if (!errorChecked && n >= 2)
-            {
+                // a delay of more than 1.5 chars means end of telegram /////, but since this is a extreme short time, we extend it by factor 2
+                nextRead = DateTime.Now.Ticks + 6 * _halfCharLength;
+             }
+             if (!errorChecked && n >= 2)
+             {
                errorChecked = true;
                if ((buffer[1] & 0x80) != 0)
                {
@@ -276,61 +270,7 @@ namespace Osre.Modbus.Interface
             {
                telegramLength = (short)n;
                return true;
-            }
-            else
-            {
-                int dummy3 = n;
-                
-                int dummy4 = dummy3 + 1;
-            }
-            if (desiredLength <= 0)
-            {
-                if (n >= 2)
-                {
-                    if (DateTime.Now.Ticks > nextRead)
-                    {
-                       if (_serial.BytesToRead == 0)
-                       {
-                           var crc = ModbusUtils.CalcCrc(buffer, n - 2);
-                           if (buffer[n - 2] != (byte)(crc & 0x00ff) ||
-                               buffer[n - 1] != (byte)((crc & 0xff00) >> 8))
-                           {
-                               // read a little bit longer
-                               Thread.Sleep(1);
-                               nextRead = DateTime.Now.Ticks + 6 * _halfCharLength;
-                           }
-                           else
-                           {
-                               telegramLength = (short)n;
-                               return true;
-                           }
-                       }
-                       else
-                       {
-                           desiredLength = 0;
-                       }
-                    }
-                    else
-                    {
-                        desiredLength = 0;
-                    }
-                }
-                else
-                {
-                    desiredLength = 0;
-                }
-
-
-            }
-            else
-            {
-                desiredLength = 0;
-            }
-
-
-
-
-            /*
+            }       
             if (desiredLength <= 0 && n >= 2 && DateTime.Now.Ticks > nextRead && _serial.BytesToRead == 0)
             {
                var crc = ModbusUtils.CalcCrc(buffer, n - 2);
@@ -346,8 +286,7 @@ namespace Osre.Modbus.Interface
                   telegramLength = (short)n;
                   return true;
                }
-            }
-            */
+            }           
          }
          telegramLength = 0;
          return false;
